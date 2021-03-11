@@ -23,7 +23,9 @@ if isstring(baud) || ischar(baud)
 end
 %% Callback Commands
     switch command
-        case 'clear'            
+        case ' '
+            %intentionally blank, only generates variables above if needed
+        case 'clear'
             evalin('base','clear')
             disp('Cleared base workspace.'); 
         case 'init'
@@ -33,12 +35,12 @@ end
             catch
                 assignin('base','DSX',serialport(evalin('base','globalCom'),evalin('base','globalBaud')));  
                 fprintf('\nSuccessfully initialized DSX serial connection to %s at %u Baud.\n\n',evalin('base','globalCom'),evalin('base','globalBaud')); 
-            end
+            end %try
         case 'update'
             evalin('base', 'clear DSX');
             assignin('base','globalBaud',baud)
             assignin('base','globalCom',com)
             assignin('base','DSX',serialport(evalin('base','globalCom'),evalin('base','globalBaud')));
             fprintf('\nSuccessfully closed old port and opened %s at %u Baud.\n\n', evalin('base','globalCom'),evalin('base','globalBaud')); 
-    end
-end
+    end %switch
+end %function

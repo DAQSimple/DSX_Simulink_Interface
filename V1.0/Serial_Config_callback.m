@@ -5,7 +5,7 @@ initBaud = 9600;
 likely_com = ports(numports);
 %% Check globals
 if ~exist('globalCom')
-   assignin('base','globalCom',ports(numports));
+   assignin('base','globalCom',likely_com);
 end
 if ~exist('globalBaud')
    assignin('base','globalBaud',9600);

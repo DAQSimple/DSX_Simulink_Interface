@@ -1,24 +1,23 @@
 function Serial_Config_callback(command,com,baud)
 %% Input checks
 initBaud = 9600;
-[ports,numports] = Serial_Get_Ports(); % get list of all com ports
-likely_com = ports(numports);
+[ports,numports] = Serial_Get_Ports();  % get list of all com ports
+likely_com = ports(numports);           % guess that the device is the last com port
 %% Check globals
 if ~exist('globalCom')
-   assignin('base','globalCom',likely_com);
+   assignin('base','globalCom',likely_com);     % assign likely_com to a globalCom in the base workspace.(we will use this variable to remember our choices)
 end
 if ~exist('globalBaud')
-   assignin('base','globalBaud',9600);
+   assignin('base','globalBaud',initBaud);      % assign initBaud to a globalBaud in the base workspace.        (^)
 end
-%% Check baud input for type
-
-%% Fill empty inputs
+%% Fill empty inputs with variables from base workspace
 if ~exist('com')
-    com = evalin('base','globalCom');
+    com = evalin('base','globalCom');     
 end 
 if ~exist('baud')
     baud = evalin('base','globalBaud');
 end
+%% Convert input baud rate to an integer
 if isstring(baud) || ischar(baud)
     baud=str2double(baud);
 end
@@ -35,16 +34,6 @@ end
                 assignin('base','DSX',serialport(evalin('base','globalCom'),evalin('base','globalBaud')));  
                 fprintf('\nSuccessfully initialized DSX serial connection to %s at %u Baud.\n\n',evalin('base','globalCom'),evalin('base','globalBaud')); 
             end
-          
-%         case 'update_baud'    % old commands, combined into 'update' command
-%             assignin('base','globalBaud',str2double(baud))                 % update globalBaud value with function input
-%             assignin('base','DSX.BaudRate',evalin('base','globalBaud'));    % update DSX.BaudRate
-%             dispp('updated DSX.Baudrate with globalBaud');  
-%         case 'update_com'
-%             globalCom = input;
-%             DSXdevice = serialport(globalCom,str2double(globalBaud));
-%             dispp('updated DSX with globalCom/Baud');
-            %
         case 'update'
             evalin('base', 'clear DSX');
             assignin('base','globalBaud',baud)

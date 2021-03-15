@@ -42,16 +42,18 @@ function DoPostPropSetup(block)
 function InitializeConditions(block)
   %% Initialize Dwork
   block.Dwork(1).Data = block.DialogPrm(1).Data;
-  Serial_Send_callback('init');
+  Serial_Config_callback('init');
   flush(evalin('base','DSX'));
   
 function Update (block)
-Serial_Send_callback('send',string(block.InputPort(1).Data));
-pause(1e-3);
-Serial_Send_callback('waitping');
+Serial_Send_callback('send',block.InputPort(1).Data);
+%% caveman way of having timeout
+% pause(1e-3);
+% Serial_Config_callback('waitping');
+Serial_Receive_callback('read',block.InputPort(1).Data);
 
 function Terminate(block)
-        Serial_Send_callback('send',string(block.DialogPrm(1).Data));
-        flush(evalin('base','DSX'));
+Serial_Send_callback('send',string(block.DialogPrm(1).Data));
+flush(evalin('base','DSX'));
 %endfunction
 

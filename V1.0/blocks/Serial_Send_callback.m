@@ -6,7 +6,10 @@ function a = Serial_Send_callback(command,message)
         if ~exist('command')
             command = 'null';
             dispp('command not valid');
-        end 
+        end
+        if isnumeric(message);
+            message=num2str(message);
+        end
 %% Commmands   
     switch command
         case 'send'

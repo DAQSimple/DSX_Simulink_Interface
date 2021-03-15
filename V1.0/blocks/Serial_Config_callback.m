@@ -30,18 +30,25 @@ end
 %             disp('Cleared base workspace.'); 
             clear all;
         case 'init'
-            try 
-                evalin('base','DSX');
-                dispp('Connection already established.'); 
-            catch
-                assignin('base','DSX',serialport(evalin('base','globalCom'),evalin('base','globalBaud')));  
+            w=evalin('base','whos');
+            DSXexist = ismember('DSX',[w(:).name]);
+%             hws = get_param('base','DSX');
+%             hws.assignin('DSX.Timeout',1e-2)
+            if DSXexist
+                %nothing
+                dispp('A connection is already established');
+            else
+                assignin('base','DSX',serialport(evalin('base','globalCom'),evalin('base','globalBaud')));
+                evalin('base','DSX.Timeout = 1e-2');  
                 fprintf('\nSuccessfully initialized DSX serial connection to %s at %u Baud.\n\n',evalin('base','globalCom'),evalin('base','globalBaud')); 
             end %try
+            
         case 'update'
             evalin('base', 'clear DSX');
             assignin('base','globalBaud',baud)
             assignin('base','globalCom',com)
             assignin('base','DSX',serialport(evalin('base','globalCom'),evalin('base','globalBaud')));
+            evalin('base','DSX.Timeout = 1e-2'); 
             fprintf('\nSuccessfully closed old port and opened %s at %u Baud.\n\n', evalin('base','globalCom'),evalin('base','globalBaud')); 
     end %switch
 end %function

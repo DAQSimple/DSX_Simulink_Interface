@@ -1,8 +1,8 @@
-function DSX_Servo_Write(block)
+function DSX_Serial_Send(block)
   setup(block);
 %endfunction
 function setup(block)
-  block.NumDialogPrms =1; % initial conditions; led off
+  block.NumDialogPrms =4; % initial conditions; led off
   
   %% Register number of input and output ports
   block.NumInputPorts  = 1;
@@ -45,43 +45,25 @@ function DoPostPropSetup(block)
   block.Dwork(2).UsedAsDiscState = true;
 
 function InitializeConditions(block)
-    %% initialize
+  %% Initialize Dwork
+  block.Dwork(1).Data = block.DialogPrm(1).Data;    % safe value to send at the end of the simulation
+  block.Dwork(2).Data = block.InputPort(1).Data;    % save current
   Serial_Config_callback('init');
   flush(evalin('base','DSX'));
-function Start (block)
-%  block.Dwork(1).Data = block.DialogPrm(1).Data;
-%  block.Dwork(2).Data = block.InputPort(1).Data;
- Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, block.InputPort(1).Data));
- 
+  Serial_Send_callback('send',block.InputPort(1).Data);
+function start (block)
+ block.Dwork(2).Data = block.InputPort(1).Data;
+ Serial_Send_callback('send',block.InputPort(1).Data);
 function Update (block)
-Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, block.InputPort(1).Data));
+%     if block.Dwork(2).Data ~= block.InputPort(1).Data
+%         message = 
+%         case block.DialogPrm(
+        Serial_Send_callback('send',block.InputPort(1).Data);
+%         block.Dwork(2).Data = block.InputPort(1).Data;
+%     end
 
 function Terminate(block)
-% Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, 0)); % send final value, off
+Serial_Send_callback('send',string(block.DialogPrm(1).Data)); % send final value
 flush(evalin('base','DSX'));
 %endfunction
-
-function command = toCommand(pin,val)
-assignin('base','pwmpin',pin);
-assignin('base','pwmval',val);
-
-%% Assign leading zero to pin value if necessary:
-if length(pin) == 1
-    pin = strcat('0',pin);
-end
-%% Assign leading zeros to PWM value if necessary:
-val=num2str(val);
-switch size(val,2)
-    case 1
-        val = strcat('000',val);
-    case 2
-        val = strcat('00',val);
-    case 3
-        val = strcat('0',val);
-end
-
-%Convert to integer to avoid siecntific notation troubles, then output
-%concatenated command:
-command = sprintf('%i',str2num(strcat('16',pin,'1',val,'0'))) %convert from scientific
-assignin('base','servowritecommand',command);
 

@@ -7,23 +7,22 @@ function a = Serial_Send_callback(command,message)
             command = 'null';
             dispp('command not valid');
         end
-        if isnumeric(message);
+        if isnumeric(message)
             message=num2str(message);
         end
+        
 %% Commmands   
     switch command
         case 'send'
+            % send message to DSX
             writeline(evalin('base','DSX'),message);
+            % show message in base workspace for debugging
+            assignin('base','message',message);
+            % print console notif
             fprintf('\nSuccessfully sent "%s" to %s.\n',message ,evalin('base','DSX.Port')); 
         case 'init'        
-            try % more of a debugging case than anything, shouldn't have to use this often.
-                evalin('base','DSX')
-                dispp('DSX exists.');
-            catch
                 Serial_Config_callback('init');
-                dispp('catch: DSX not defined, initialized');
-            end %try
-        case 'waitping'
+        case 'waitping' % obsolete, was before stock serial timeout was discovered
             time0 = tic;
             timeLimit = 1;  % seconds
             while(evalin('base','DSX.NumBytesAvailable') == 0 && toc(time0)<timeLimit)

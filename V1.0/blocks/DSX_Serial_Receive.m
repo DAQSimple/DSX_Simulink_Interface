@@ -15,7 +15,7 @@ function setup(block)
     block.OutputPort(1).SamplingMode = 'Sample';
     
     block.OutputPort(1).Dimensions       = 1;
-    block.OutputPort(1).DatatypeID  = 0; % double
+    block.OutputPort(1).DatatypeID  = 0; % double -1: inherited
     block.OutputPort(1).Complexity  = 'Real';
 
 

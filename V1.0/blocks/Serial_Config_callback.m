@@ -1,6 +1,7 @@
 function Serial_Config_callback(command,com,baud)
 %% Input checks
 initBaud = 9600;
+timeOutString = 'DSX.Timeout = 1e-1';
 [ports,numports] = Serial_Get_Ports();  % get list of all com ports
 likely_com = ports(numports);           % guess that the device is the last com port
 %% Check globals
@@ -17,6 +18,9 @@ end
 if ~exist('baud')
     baud = evalin('base','globalBaud');
 end
+if ~exist('sBuffer')
+   assignin('base','sBuffer',[]);
+end
 %% Convert input baud rate to an integer
 if isstring(baud) || ischar(baud)
     baud=str2double(baud);
@@ -32,23 +36,22 @@ end
         case 'init'
             w=evalin('base','whos');
             DSXexist = ismember('DSX',[w(:).name]);
-%             hws = get_param('base','DSX');
-%             hws.assignin('DSX.Timeout',1e-2)
             if DSXexist
                 %nothing
-                dispp('A connection is already established');
+                flush(evalin('base','DSX'));   
+%                 dispp('A connection is already established.');
             else
+               
                 assignin('base','DSX',serialport(evalin('base','globalCom'),evalin('base','globalBaud')));
-                evalin('base','DSX.Timeout = 1e-2');  
+                evalin('base',timeOutString); % set DSX timeout 
                 fprintf('\nSuccessfully initialized DSX serial connection to %s at %u Baud.\n\n',evalin('base','globalCom'),evalin('base','globalBaud')); 
-            end %try
-            
+            end %try        
         case 'update'
             evalin('base', 'clear DSX');
             assignin('base','globalBaud',baud)
             assignin('base','globalCom',com)
             assignin('base','DSX',serialport(evalin('base','globalCom'),evalin('base','globalBaud')));
-            evalin('base','DSX.Timeout = 1e-2'); 
+            evalin('base',timeOutString); %set DSX timeout
             fprintf('\nSuccessfully closed old port and opened %s at %u Baud.\n\n', evalin('base','globalCom'),evalin('base','globalBaud')); 
     end %switch
 end %function

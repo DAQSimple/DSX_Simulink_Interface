@@ -1,0 +1,13 @@
+UPDATE LOG:
+
+3/24/2021:
+	- test scripts added
+	- trying to:
+		- send command (asking for ping back)
+		- read ping from DSX
+		- show ping
+
+	- Write blocks are are functional (Digital, PWM, Servo)
+
+	- ^ that is if matlab is working properly with Arduino
+

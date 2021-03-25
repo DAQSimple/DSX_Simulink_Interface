@@ -17,6 +17,10 @@ function setup(block)
     block.OutputPort(1).Dimensions       = 1;
     block.OutputPort(1).DatatypeID  = 0; % double -1: inherited
     block.OutputPort(1).Complexity  = 'Real';
+    block.OutputPort(2).SamplingMode = 'Sample'; 
+    block.OutputPort(2).Dimensions       = 1;
+    block.OutputPort(2).DatatypeID  = 0; % double -1: inherited
+    block.OutputPort(2).Complexity  = 'Real';
 %     block.OutputPort(2).SamplingMode = 'Sample'; 
 %     block.OutputPort(2).Dimensions       = 1;
 %     block.OutputPort(2).DatatypeID  = 0; % double -1: inherited
@@ -51,8 +55,8 @@ function DoPostPropSetup(block)
 
 function InitializeConditions(block)
     %% Initialize Dwork
-    block.Dwork(1).Data = block.DialogPrm(1).Data; % function: read what 
-    block.Dwork(2).Data = block.DialogPrm(2).Data; % location: read where
+%     block.Dwork(1).Data = block.DialogPrm(1).Data; % function: read where
+
     %% output inputs to base workspcae for debugging
 %     assignin('base','func_s_func',block.Dwork(1).Data)
 %     assignin('base','loc_s_func',block.Dwork(2).Data)
@@ -61,25 +65,22 @@ function InitializeConditions(block)
     flush(evalin('base','DSX'));
 function Update(block)
     block.Dwork(1).Data = block.DialogPrm(1).Data; % function: read what 
-    block.Dwork(2).Data = block.DialogPrm(2).Data; % location: read where
-    loc = block.DialogPrm(2).Data;
+%     block.Dwork(2).Data = block.DialogPrm(2).Data; % location: read where
+    loc = block.DialogPrm(1).Data;
 function Outputs(block)  
     %% Refresh work vectors with updated mask parameters
     block.Dwork(1).Data = block.DialogPrm(1).Data; % function: read what 
-    block.Dwork(2).Data = block.DialogPrm(2).Data; % location: read where
-    loc = block.DialogPrm(2).Data;
+%     block.Dwork(2).Data = block.DialogPrm(2).Data; % location: read where
+    loc = block.DialogPrm(1).Data;
     temp=[]; %will be what we send as a request to DSX
     %% Determine output based on case
-switch block.Dwork(1).Data
-    case 1 % GPIO: ask for value of loc pin
-        if loc<10 
-            temp = str2num(strcat(num2str(110),num2str(loc),'000000')); %add zero to pin location
-        else
-            temp = str2num(strcat(num2str(11),num2str(loc),'000000')); %no zero added as number has 2 digits
-        end
-    case 2
-            temp = 1702000000; % ask for encoder value   
+
+    if loc<10 
+        temp = str2num(strcat(num2str(110),num2str(loc),'000000')); %add zero to pin location
+    else
+        temp = str2num(strcat(num2str(11),num2str(loc),'000000')); %no zero added as number has 2 digits
     end
+
     pingfromDSX = Serial_Receive_callback('read',temp);
     
     pingchar = num2str(pingfromDSX);
@@ -92,9 +93,6 @@ switch block.Dwork(1).Data
 %               block.OutputPort(2).Data = pingfromDSX;
               assignin('base','val',val);
            end
-       elseif pingchar(1:2) == '17'
-           out = pingchar(5);
-           block.OutputPort(1).Data = str2num(strcat(out,num2str(val)));
        else
 %            block.OutputPort(1).Data = 0;
        end

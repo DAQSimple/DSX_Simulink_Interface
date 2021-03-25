@@ -5,21 +5,25 @@ timeOutString = 'DSX.Timeout = 1e-1';
 [ports,numports] = Serial_Get_Ports();  % get list of all com ports
 likely_com = ports(numports);           % guess that the device is the last com port
 %% Check globals
-if ~exist('globalCom')
+w=evalin('base','whos');
+exist_globalCom = ismember('globalCom',[w(:).name]);
+exist_globalBaud = ismember('globalCom',[w(:).name]);
+exist_sBuffer = ismember('globalBaud',[w(:).name]);
+
+if exist_globalCom>0
+else
    assignin('base','globalCom',likely_com);     % assign likely_com to a globalCom in the base workspace.(we will use this variable to remember our choices)
 end
-if ~exist('globalBaud')
+if exist_globalBaud>0
+else
    assignin('base','globalBaud',initBaud);      % assign initBaud to a globalBaud in the base workspace.        (^)
 end
-%% Fill empty inputs with variables from base workspace
+%% Fill empty function inputs with variables from base workspace
 if ~exist('com')
     com = evalin('base','globalCom');     
 end 
 if ~exist('baud')
     baud = evalin('base','globalBaud');
-end
-if ~exist('sBuffer')
-   assignin('base','sBuffer',[]);
 end
 %% Convert input baud rate to an integer
 if isstring(baud) || ischar(baud)
@@ -44,6 +48,7 @@ end
                
                 assignin('base','DSX',serialport(evalin('base','globalCom'),evalin('base','globalBaud')));
                 evalin('base',timeOutString); % set DSX timeout 
+%                 Serial_Send_callback('send','0000000000');
                 fprintf('\nSuccessfully initialized DSX serial connection to %s at %u Baud.\n\n',evalin('base','globalCom'),evalin('base','globalBaud')); 
             end %try        
         case 'update'

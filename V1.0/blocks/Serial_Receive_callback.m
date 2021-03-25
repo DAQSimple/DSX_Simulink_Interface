@@ -3,25 +3,32 @@ function fromDSX = Serial_Receive_callback(command,spec)
 Serial_Config_callback('init')
 
 %% Checks
+w=evalin('base','whos');
+exist_sBuffer = ismember('sBuffer',[w(:).name]);
+
 if ~exist('spec')
     spec = [];
 end
 if isstring(spec)
    spec = str2num(spec); 
 end
-if ~exist('sBuffer')
-    assignin('base','sBuffer',[0]);
+if exist_sBuffer>0
+else
+    assignin('base','sBuffer',[]);
 end
 %% Commands
     switch command
         % no input needed, only specify 'read' 
-        case 'readnext'  
+        case 'readnext'
+%             pause(0.3); % delay for testing
             fromDSX = readline(evalin('base','DSX'));
+            assignin('base','fromDSX',fromDSX);
+%             fromDSX = erase(fromDSX,'\n');
             
-            if isstring(fromDSX)                         % Convert to int
-                fromDSX = str2num(fromDSX);
-            end
-            
+%             if isstring(fromDSX)                         % Convert to int
+%                 fromDSX = str2num(fromDSX);
+%             end
+%             
             sBuffer = evalin('base','sBuffer');   % import old serial buffer from base workspace
             new_sBuffer = [sBuffer;fromDSX];        
             assignin('base','sBuffer',new_sBuffer)

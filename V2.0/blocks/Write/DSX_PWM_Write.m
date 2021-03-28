@@ -14,7 +14,7 @@ function setup(block)
   block.SetPreCompOutPortInfoToDynamic;
  
   block.InputPort(1).Dimensions        = 1;
-  block.InputPort(1).DirectFeedthrough = false;
+  block.InputPort(1).DirectFeedthrough = true;
   
   %% Set block sample time to inherited
   block.SampleTimes = [-1 0];

@@ -13,7 +13,7 @@ function setup(block)
     block.SetPreCompInpPortInfoToDynamic;
     block.SetPreCompOutPortInfoToDynamic;
     block.InputPort(1).Dimensions        = 1;
-    block.InputPort(1).DirectFeedthrough = false
+    block.InputPort(1).DirectFeedthrough = true;
     %% Set block sample time to inherited
     block.SampleTimes = [-1 0];
 
@@ -25,12 +25,10 @@ function setup(block)
     block.RegBlockMethod('Terminate', @Terminate); % Required
 
 % At the start of the simulation
-function InitializeConditions()
-    
+function InitializeConditions(block)
     Serial_Config_callback('init'); % Ensure serial port connection 
     % Flush serial buffer in case port already exists and buffer isnt empty 
     flush(evalin('base','DSX'));                                  
-    
 % Every time step
 function Update (block)
 

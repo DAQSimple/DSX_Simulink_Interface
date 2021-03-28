@@ -1,17 +1,21 @@
-% test_script
-% message being sent
-clear all;
-clc;
+%% test_script
+
+% clear all;
+% clc;
+
+% messages
 x=1009100019;
+xoff=1009100009;
+read07=1107000000;
+
 % Initialize COM port
 Serial_Config_callback('init');
-% wait 1s
 % pause(1)
 % send x to DSX
-Serial_Send_callback('send',x)
-% wait 1s
+% Serial_Send_callback('send',xoff)
 % pause(1)
+
 % get ping from DSX
-bytes_available = evalin('base','DSX.NumBytesAvailable')
-% pingfromDSX = Serial_Receive_callback('readnext')
-readline(evalin('base','DSX'))
+% bytes_available = evalin('base','DSX.NumBytesAvailable')
+
+VALUE = Serial_Receive_callback('getval',read07)

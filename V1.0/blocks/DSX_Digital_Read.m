@@ -35,7 +35,7 @@ function setup(block)
     block.RegBlockMethod('PostPropagationSetup',@DoPostPropSetup);
 %     block.RegBlockMethod('Start', @Start);
     block.RegBlockMethod('Outputs', @Outputs);     % Required
-    block.RegBlockMethod('Update', @Update);
+%     block.RegBlockMethod('Update', @Update);
     block.RegBlockMethod('Terminate', @Terminate); % Required
     %endfunction
 
@@ -63,10 +63,9 @@ function InitializeConditions(block)
     %% init
     Serial_Config_callback('init');
     flush(evalin('base','DSX'));
-function Update(block)
-    block.Dwork(1).Data = block.DialogPrm(1).Data; % function: read what 
-%     block.Dwork(2).Data = block.DialogPrm(2).Data; % location: read where
-    loc = block.DialogPrm(1).Data;
+% function Update(block)
+%  
+
 function Outputs(block)  
     %% Refresh work vectors with updated mask parameters
     block.Dwork(1).Data = block.DialogPrm(1).Data; % function: read what 
@@ -81,21 +80,21 @@ function Outputs(block)
         temp = str2num(strcat(num2str(11),num2str(loc),'000000')); %no zero added as number has 2 digits
     end
 
-    pingfromDSX = Serial_Receive_callback('read',temp);
-    
-    pingchar = num2str(pingfromDSX);
-    if isempty(pingfromDSX)
-    else
-       val = str2num(pingchar(6:9));
-       if pingchar(1:2) == '11'
-           if val ~= 8888
-              block.OutputPort(1).Data = val;
-%               block.OutputPort(2).Data = pingfromDSX;
-              assignin('base','val',val);
-           end
-       else
-%            block.OutputPort(1).Data = 0;
-       end
+    DSXval = Serial_Receive_callback('getval',temp);
+    if ~isempty(DSXval)
+%        val = str2num(pingchar(6:9));
+%        if pingchar(1:2) == '11'
+%            if val ~= 8888
+%               block.OutputPort(1).Data = val;
+% %               block.OutputPort(2).Data = pingfromDSX;
+%               assignin('base','val',val);
+%            end
+%        else
+% %            block.OutputPort(1).Data = 0;
+%        end
+        
+        block.OutputPort(1).Data = str2num(DSXval);
+%         block.OutputPort(2).Data = DSXval;
     end    
 function Terminate(block)
     flush(evalin('base','DSX'));

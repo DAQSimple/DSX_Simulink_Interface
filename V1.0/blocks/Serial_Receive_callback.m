@@ -1,6 +1,6 @@
 function fromDSX = Serial_Receive_callback(command,spec)
 %% Ensure DSX exists
-Serial_Config_callback('init')
+% Serial_Config_callback('init')
 
 
 %% Checks

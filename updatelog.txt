@@ -11,3 +11,7 @@ UPDATE LOG:
 
 	- ^ that is if matlab is working properly with Arduino
 
+3/27/2021: 
+	- Digital Read, Analog Read working
+	- Succesfully reading serial commands into a buffer where blocks look for their respective pings
+		

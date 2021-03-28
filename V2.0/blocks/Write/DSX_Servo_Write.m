@@ -23,36 +23,15 @@ function setup(block)
   block.SimStateCompliance = 'DefaultSimState';
   %% Register methods
     block.RegBlockMethod('InitializeConditions', @InitializeConditions);
-    block.RegBlockMethod('PostPropagationSetup',@DoPostPropSetup);
-    block.RegBlockMethod('Start', @Start);
-%     block.RegBlockMethod('Outputs', @Outputs);     % Required
     block.RegBlockMethod('Update', @Update);
     block.RegBlockMethod('Terminate', @Terminate); % Required
 %endfunction
-
-function DoPostPropSetup(block)
- %% Setup Dwork
-  block.NumDworks = 2;
-  block.Dwork(1).Name = 'x0'; 
-  block.Dwork(1).Dimensions      = 1;
-  block.Dwork(1).DatatypeID      = 0;
-  block.Dwork(1).Complexity      = 'Real';
-  block.Dwork(1).UsedAsDiscState = true;
-  block.Dwork(2).Name = 'x1'; 
-  block.Dwork(2).Dimensions      = 1;
-  block.Dwork(2).DatatypeID      = 0;
-  block.Dwork(2).Complexity      = 'Real';
-  block.Dwork(2).UsedAsDiscState = true;
 
 function InitializeConditions(block)
     %% initialize
   Serial_Config_callback('init');
   flush(evalin('base','DSX'));
-function Start (block)
-%  block.Dwork(1).Data = block.DialogPrm(1).Data;
-%  block.Dwork(2).Data = block.InputPort(1).Data;
- Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, block.InputPort(1).Data));
- 
+
 function Update (block)
 Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, block.InputPort(1).Data));
 
@@ -62,8 +41,8 @@ flush(evalin('base','DSX'));
 %endfunction
 
 function command = toCommand(pin,val)
-assignin('base','pwmpin',pin);
-assignin('base','pwmval',val);
+% assignin('base','pwmpin',pin);
+% assignin('base','pwmval',val);
 
 %% Assign leading zero to pin value if necessary:
 if length(pin) == 1
@@ -83,5 +62,5 @@ end
 %Convert to integer to avoid siecntific notation troubles, then output
 %concatenated command:
 command = sprintf('%i',str2num(strcat('16',pin,'1',val,'0'))) %convert from scientific
-assignin('base','servowritecommand',command);
+% assignin('base','servowritecommand',command);
 

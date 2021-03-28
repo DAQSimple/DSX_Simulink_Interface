@@ -12,6 +12,8 @@ UPDATE LOG:
 	- ^ that is if matlab is working properly with Arduino
 
 3/27/2021: 
+	- Digital Write on hold, debugging right now
+
 	- Digital Read, Analog Read working
 	- Succesfully reading serial commands into a buffer where blocks look for their respective pings
 	- To use V2.0, reinitialize the DSX library using the steps in the readme

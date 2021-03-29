@@ -33,7 +33,12 @@ function InitializeConditions(block)
   flush(evalin('base','DSX'));
 
 function Update (block)
-Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, block.InputPort(1).Data));
+val = block.InputPort(1).Data;
+if val > 180
+    val = 180;
+end
+Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, val));
+
 
 function Terminate(block)
 % Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, 0)); % send final value, off

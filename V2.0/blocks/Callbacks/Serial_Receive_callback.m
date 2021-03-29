@@ -112,7 +112,7 @@ end
                             
                             % Convert to char for indexing
                             pullValue = num2str(pullValue);
-                            pullValue
+                            
                             % FINALLY extract value from ping
                             fromDSX = pullValue(end-4:end-1);
                             

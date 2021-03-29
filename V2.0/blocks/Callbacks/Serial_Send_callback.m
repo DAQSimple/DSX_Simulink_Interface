@@ -18,10 +18,10 @@ function a = Serial_Send_callback(command,message)
 %             pause(0.001);
             writeline(evalin('base','DSX'),message);
             % show message in base workspace for debugging
-            assignin('base','message',message);
+%             assignin('base','message',message);
             % print console notif
 %             fprintf('\nSuccessfully sent "%s" to %s.\n',message ,evalin('base','DSX.Port'));
-            fprintf('\nNo error after supposedly sending "%s" to %s.\n',message ,evalin('base','DSX.Port'));
+%             fprintf('\nNo error after supposedly sending "%s" to %s.\n',message ,evalin('base','DSX.Port'));
         case 'init'        
                 Serial_Config_callback('init');
         case 'waitping' % obsolete, was before stock serial timeout was discovered

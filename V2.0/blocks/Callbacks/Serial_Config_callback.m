@@ -54,7 +54,13 @@ end
         case 'update'
             evalin('base', 'clear DSX');
             assignin('base','globalBaud',baud)
-            assignin('base','globalCom',com)
+            
+            if isstring(com)    % convert to char array
+                com=char(com);
+            end
+            if com(1:3)=='COM'  % ensure input COM is real, handles "select a port" in config block
+                assignin('base','globalCom',com)
+            end
             assignin('base','DSX',serialport(evalin('base','globalCom'),evalin('base','globalBaud')));
             evalin('base',timeOutString); %set DSX timeout
             fprintf('\nSuccessfully closed old port and opened %s at %u Baud.\n\n', evalin('base','globalCom'),evalin('base','globalBaud')); 

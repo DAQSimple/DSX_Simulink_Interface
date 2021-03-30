@@ -17,21 +17,15 @@ function setup(block)
     block.OutputPort(1).Dimensions       = 1;
     block.OutputPort(1).DatatypeID  = 0; % double -1: inherited
     block.OutputPort(1).Complexity  = 'Real';
-%     block.OutputPort(2).SamplingMode = 'Sample'; 
-%     block.OutputPort(2).Dimensions       = 1;
-%     block.OutputPort(2).DatatypeID  = 0; % double -1: inherited
-%     block.OutputPort(2).Complexity  = 'Real';
-
+    
 %% Set block sample time to inherited
     block.SampleTimes = [-1 0];
+    
 %% Set the block simStateCompliance to default (i.e., same as a built-in block)
     block.SimStateCompliance = 'DefaultSimState';
 %% Register methods (what functions we'll use)
     block.RegBlockMethod('InitializeConditions', @InitializeConditions);
-%     block.RegBlockMethod('PostPropagationSetup',@DoPostPropSetup);
-%     block.RegBlockMethod('Start', @Start);
     block.RegBlockMethod('Outputs', @Outputs);     % Required
-%     block.RegBlockMethod('Update', @Update);
     block.RegBlockMethod('Terminate', @Terminate); % Required
     %endfunction
 function InitializeConditions(block)
@@ -40,7 +34,7 @@ function InitializeConditions(block)
 
 function Outputs(block)  
     loc = block.DialogPrm(1).Data;
-    assignin('base','AnalogLocFromMask',loc)
+%     assignin('base','AnalogLocFromMask',loc)
     switch loc
         case 'A0'
             loc = 20;
@@ -55,7 +49,7 @@ function Outputs(block)
         case 'A5'
             loc = 25;
     end
-    assignin('base','AnalogLoc',loc)
+%     assignin('base','AnalogLoc',loc)
     spec=[]; %will be what we send as a request to DSX
     %% Determine output based on case
     spec = str2num(strcat(num2str(13),num2str(loc),'000003')); %no zero added as number has 2 digits

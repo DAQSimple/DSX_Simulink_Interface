@@ -21,10 +21,6 @@ function setup(block)
     block.OutputPort(2).Dimensions       = 1;
     block.OutputPort(2).DatatypeID  = 0; % double -1: inherited
     block.OutputPort(2).Complexity  = 'Real';
-%     block.OutputPort(2).SamplingMode = 'Sample'; 
-%     block.OutputPort(2).Dimensions       = 1;
-%     block.OutputPort(2).DatatypeID  = 0; % double -1: inherited
-%     block.OutputPort(2).Complexity  = 'Real';
 
 %% Set block sample time to inherited
     block.SampleTimes = [-1 0];
@@ -32,66 +28,31 @@ function setup(block)
     block.SimStateCompliance = 'DefaultSimState';
 %% Register methods (what functions we'll use)
     block.RegBlockMethod('InitializeConditions', @InitializeConditions);
-    block.RegBlockMethod('PostPropagationSetup',@DoPostPropSetup);
-%     block.RegBlockMethod('Start', @Start);
     block.RegBlockMethod('Outputs', @Outputs);     % Required
-%     block.RegBlockMethod('Update', @Update);
     block.RegBlockMethod('Terminate', @Terminate); % Required
     %endfunction
 
-function DoPostPropSetup(block)
-    %% Setup Dwork
-    block.NumDworks = 2;
-    block.Dwork(1).Name = 'function'; 
-    block.Dwork(1).Dimensions      = 1;
-    block.Dwork(1).DatatypeID      = 0;
-    block.Dwork(1).Complexity      = 'Real';
-    block.Dwork(1).UsedAsDiscState = true;
-    block.Dwork(2).Name = 'x0'; 
-    block.Dwork(2).Dimensions      = 1;
-    block.Dwork(2).DatatypeID      = 0;
-    block.Dwork(2).Complexity      = 'Real';
-    block.Dwork(2).UsedAsDiscState = true;
-
 function InitializeConditions(block)
-    %% Initialize Dwork
-%     block.Dwork(1).Data = block.DialogPrm(1).Data; % function: read where
-
-    %% output inputs to base workspcae for debugging
-%     assignin('base','func_s_func',block.Dwork(1).Data)
-%     assignin('base','loc_s_func',block.Dwork(2).Data)
-    %% init
     Serial_Config_callback('init');
-    flush(evalin('base','DSX'));
-% function Update(block)
-%  
-
+    flush(evalin('base','DSX'));  
 function Outputs(block)  
-    %% Refresh work vectors with updated mask parameters
-    block.Dwork(1).Data = block.DialogPrm(1).Data; % function: read what 
-%     block.Dwork(2).Data = block.DialogPrm(2).Data; % location: read where
     loc = block.DialogPrm(1).Data;
     temp=[]; %will be what we send as a request to DSX
     %% Determine output based on case
 
-
     temp = str2num(strcat(num2str(17),num2str(loc),'000000')); %no zero added as number has 2 digits
 
 
-    DSXval = Serial_Receive_callback('getval',temp);
+    [DSXval,DSXsign] = Serial_Receive_callback('getval',temp);
+    
     if ~isempty(DSXval)
-%        val = str2num(pingchar(6:9));
-%        if pingchar(1:2) == '11'
-%            if val ~= 8888
-%               block.OutputPort(1).Data = val;
-% %               block.OutputPort(2).Data = pingfromDSX;
-%               assignin('base','val',val);
-%            end
-%        else
-% %            block.OutputPort(1).Data = 0;
-%        end
-        
-        block.OutputPort(1).Data = str2num(DSXval);
+        if DSXsign == '1'   % if positive sign
+            block.OutputPort(1).Data = str2num(DSXval);
+            block.OutputPort(2).Data = str2num(DSXsign);
+        elseif DSXsign == '0'   % if negative sign
+            block.OutputPort(1).Data = -str2num(DSXval);
+            block.OutputPort(2).Data = str2num(DSXsign);
+        end
 %         block.OutputPort(2).Data = DSXval;
     end    
 function Terminate(block)

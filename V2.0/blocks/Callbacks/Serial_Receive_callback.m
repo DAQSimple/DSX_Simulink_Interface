@@ -1,4 +1,4 @@
-function fromDSX = Serial_Receive_callback(command,spec)
+function [fromDSX,fromDSXsign] = Serial_Receive_callback(command,spec)
 %% Ensure DSX exists
 % Serial_Config_callback('init')
 
@@ -39,6 +39,7 @@ end
                 if fromDSXchar(end-4:end-1)=='8888' % Value slots
                     %do nothing with ping, discard
                 else
+                    fromDSXsign = fromDSXchar(end-5);
                     sBuffer = evalin('base','sBuffer');   % import old serial buffer from base workspace
                     new_sBuffer = [sBuffer;fromDSX];      % add ping to end 
                     assignin('base','sBuffer',new_sBuffer); % update sBuffer in base workspace
@@ -73,7 +74,7 @@ end
 %             end
         case 'getval'
             %% Accepts an input command of 10 digits to send to DSX, receives
-            % ping back and returns the value bits of ping
+            % ping back and returns the value and sign bits of ping
             
             %% send command to simulink asking for value
             Serial_Send_callback('send',spec)  
@@ -89,6 +90,7 @@ end
                     % Convert from strin to char
                     fromDSXchar = num2str(fromDSXnum);
                     fromDSXval = fromDSXchar(end-4:end-1); 
+                    fromDSXsign = fromDSXchar(end-5);
                     if fromDSXval=='8888' % Ignore if value is 8888
                         %do nothing with ping, discard
                     else %store add to buffer
@@ -125,6 +127,7 @@ end
 
             else % if there was nothing to read, return zero
                 fromDSX = [];
+                fromDSXsign = [];
             end
             
             

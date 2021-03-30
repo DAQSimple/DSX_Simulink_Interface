@@ -31,14 +31,13 @@ function InitializeConditions(block)
   %% Execute when anything in block is updated or block is loaded
   Serial_Config_callback('init');
   %% set PWM frequency to frequency specified in mask
-  assignin('base','PWMfreq',block.DialogPrm(2).Data);
+%   assignin('base','PWMfreq',block.DialogPrm(2).Data);
   if size(block.DialogPrm(2).Data,2) == 5  % handles 32000 case, 1 bit too large
       Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, '3200')); %shrink down to 4 bits
   else
       Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,block.DialogPrm(2).Data))
   end
   
-
 function Update (block)
 val = block.InputPort(1).Data;
 if val > 100

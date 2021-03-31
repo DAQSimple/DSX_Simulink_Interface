@@ -28,14 +28,13 @@ function setup(block)
 %endfunction
 
 function InitializeConditions(block)
-  %% Execute when anything in block is updated or block is loaded
   Serial_Config_callback('init');
   %% set PWM frequency to frequency specified in mask
-%   assignin('base','PWMfreq',block.DialogPrm(2).Data);
+ 
   if size(block.DialogPrm(2).Data,2) == 5  % handles 32000 case, 1 bit too large
-      Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, '3200')); %shrink down to 4 bits
+      Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, '3200','15')); %shrink down to 4 bits
   else
-      Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,block.DialogPrm(2).Data))
+      Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,block.DialogPrm(2).Data,'15'))
   end
   
 function Update (block)
@@ -43,14 +42,14 @@ val = block.InputPort(1).Data;
 if val > 100
     val = 100;
 end
-Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, val));
+Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, val,'14'));
 
 function Terminate(block)
-Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, 0)); % send final value, off
+Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, 0,'14')); % send final value, off
 flush(evalin('base','DSX'));
 %endfunction
 
-function command = toCommand(pin,val)
+function command = toCommand(pin,val,func)
 % assignin('base','pin',pin);
 % assignin('base','val',val);
 
@@ -70,6 +69,6 @@ switch size(val,2)
     case 4
         val = val;
 end
-command = sprintf('%i',str2num(strcat('14',pin,'1',val,'0')));
+command = sprintf('%i',str2num(strcat(func,pin,'1',val,'0')));
 % assignin('base','pwmwritecommand',command);
 

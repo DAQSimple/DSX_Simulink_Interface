@@ -12,7 +12,9 @@ function setup(block)
   %% inherited.
   block.SetPreCompInpPortInfoToDynamic;
   block.SetPreCompOutPortInfoToDynamic;
- 
+  
+  
+  block.InputPort(1).DatatypeID = -1;
   block.InputPort(1).Dimensions        = 1;
   block.InputPort(1).DirectFeedthrough = true;
   
@@ -29,8 +31,7 @@ function setup(block)
 
 function InitializeConditions(block)
   Serial_Config_callback('init');
-  %% set PWM frequency to frequency specified in mask
- 
+  %% set PWM frequency once at start of simulation
   if size(block.DialogPrm(2).Data,2) == 5  % handles 32000 case, 1 bit too large
       Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, '3200','15')); %shrink down to 4 bits
   else
@@ -38,7 +39,8 @@ function InitializeConditions(block)
   end
   
 function Update (block)
-val = block.InputPort(1).Data;
+%% Send user input value as PWM duty cycle to DSX
+val = round(block.InputPort(1).DataAsDouble);
 if val > 100
     val = 100;
 end

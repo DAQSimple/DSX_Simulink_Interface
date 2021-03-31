@@ -1,8 +1,8 @@
-function DSX_Servo_Write(block)
+function DSX_PWM_Write(block)
   setup(block);
 %endfunction
 function setup(block)
-  block.NumDialogPrms =1; % initial conditions; led off
+  block.NumDialogPrms =2; % initial conditions; led off
   
   %% Register number of input and output ports
   block.NumInputPorts  = 1;
@@ -12,9 +12,9 @@ function setup(block)
   %% inherited.
   block.SetPreCompInpPortInfoToDynamic;
   block.SetPreCompOutPortInfoToDynamic;
- 
-  block.InputPort(1).DatatypeID = -1;
   
+  
+  block.InputPort(n).DatatypeID = 
   block.InputPort(1).Dimensions        = 1;
   block.InputPort(1).DirectFeedthrough = true;
   
@@ -30,33 +30,36 @@ function setup(block)
 %endfunction
 
 function InitializeConditions(block)
-    %% initialize
   Serial_Config_callback('init');
-  flush(evalin('base','DSX'));
-
+  %% set PWM frequency to frequency specified in mask
+ 
+  if size(block.DialogPrm(2).Data,2) == 5  % handles 32000 case, 1 bit too large
+      Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, '3200','15')); %shrink down to 4 bits
+  else
+      Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,block.DialogPrm(2).Data,'15'))
+  end
+  
 function Update (block)
-%% Sent user input value as servo angle to DSX
-val = round(block.InputPort(1).DataAsDouble);
-if val > 180
-    val = 180;
+val = block.InputPort(1).Data;
+if val > 100
+    val = 100;
 end
-Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, val));
-
+Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, val,'14'));
 
 function Terminate(block)
-% Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, 0)); % send final value, off
+Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, 0,'14')); % send final value, off
 flush(evalin('base','DSX'));
 %endfunction
 
-function command = toCommand(pin,val)
-% assignin('base','pwmpin',pin);
-% assignin('base','pwmval',val);
+function command = toCommand(pin,val,func)
+% assignin('base','pin',pin);
+% assignin('base','val',val);
 
-%% Assign leading zero to pin value if necessary:
+%% Assign leading zero to pin value if necessary
 if length(pin) == 1
     pin = strcat('0',pin);
 end
-%% Assign leading zeros to PWM value if necessary:
+%% Assign leading zeros to PWM value if necessary
 val=num2str(val);
 switch size(val,2)
     case 1
@@ -65,10 +68,9 @@ switch size(val,2)
         val = strcat('00',val);
     case 3
         val = strcat('0',val);
+    case 4
+        val = val;
 end
-
-%Convert to integer to avoid siecntific notation troubles, then output
-%concatenated command:
-command = sprintf('%i',str2num(strcat('16',pin,'1',val,'0'))); %convert from scientific
-% assignin('base','servowritecommand',command);
+command = sprintf('%i',str2num(strcat(func,pin,'1',val,'0')));
+% assignin('base','pwmwritecommand',command);
 

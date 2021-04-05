@@ -43,9 +43,9 @@ function InitializeConditions(block)
 % Every time step
 function Start(block)
     block.Dwork(1).Data = 1337; %initialize work vector as neither 0 or 1
-    assignin('base','startDwork',block.Dwork(1).Data);
+%     assignin('base','startDwork',block.Dwork(1).Data);
 function Update (block)
-    assignin('base','Dworkupdate',block.Dwork(1).Data);
+%     assignin('base','Dworkupdate',block.Dwork(1).Data);
     val = block.InputPort(1).Data; % Data input to block
     if val >= 0.5  % 0 or 1
         val = 1;
@@ -58,7 +58,7 @@ function Update (block)
         assignin('base','sentVal',val);
     end
     block.Dwork(1).Data = val; % save current value for next update
-    assignin('base','DworkVal',val);
+%     assignin('base','DworkVal',val);
     
 % When program is stopped or the block is deleted
 function Terminate(block)
@@ -71,4 +71,4 @@ function command = toCommand(pin,val)
         pin = strcat('0',pin);
     end
     command = sprintf('%i',str2num(strcat('10',pin,'1','000',num2str(val),'0')));
-    assignin('base','digitalwritecommand',command);
+%     assignin('base','digitalwritecommand',command);

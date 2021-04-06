@@ -56,13 +56,13 @@ function Update (block)
     
     % send command if it's different from the last sent, else nothing
     if val ~= block.Dwork(1).Data
-        Serial_Send_callback('send',toCommand(20, val,'20'));
+        Serial_Send_callback('send',toCommand('20', val,'20'));
     end
     % save last value in work vector
     block.Dwork(1).Data = val; 
 
 function Terminate(block)
-    Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, 0,'20')); % send final value, off
+    Serial_Send_callback('send',toCommand('20', 0,'20')); % send final value, off
     flush(evalin('base','DSX'));
     %endfunction
 

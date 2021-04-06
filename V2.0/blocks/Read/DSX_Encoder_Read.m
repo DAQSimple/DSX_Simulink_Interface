@@ -7,7 +7,7 @@ function setup(block)
 %     block.NumDialogPrms =2; % initial conditions; led off
     block.NumDialogPrms =1; % initial conditions; led off
     %% Register number of input and output ports
-    block.NumOutputPorts = 1;
+    block.NumOutputPorts = 2;
     %% Setup functional port properties to dynamically
     %% inherited.
 %     block.SetPreCompInpPortInfoToDynamic;
@@ -17,10 +17,10 @@ function setup(block)
     block.OutputPort(1).Dimensions       = 1;
     block.OutputPort(1).DatatypeID  = 0; % double -1: inherited
     block.OutputPort(1).Complexity  = 'Real';
-%     block.OutputPort(2).SamplingMode = 'Sample'; 
-%     block.OutputPort(2).Dimensions       = 1;
-%     block.OutputPort(2).DatatypeID  = 0; % double -1: inherited
-%     block.OutputPort(2).Complexity  = 'Real';
+    block.OutputPort(2).SamplingMode = 'Sample'; 
+    block.OutputPort(2).Dimensions       = 1;
+    block.OutputPort(2).DatatypeID  = 0; % double -1: inherited
+    block.OutputPort(2).Complexity  = 'Real';
 
 %% Set block sample time to inherited
     block.SampleTimes = [-1 0];
@@ -53,13 +53,16 @@ function Outputs(block)
     assignin('base','EncoderReadVal',DSXval);
     assignin('base','EncoderReadSign',DSXsign);
     if ~isempty(DSXval)
-        if DSXsign == '1'   % if positive sign
-            block.OutputPort(1).Data = str2num(DSXval);
+        %% old code, implements sign to output value
+        block.OutputPort(1).Data = str2num(DSXval);
+        block.OutputPort(2).Data = str2num(DSXsign);
+%         if DSXsign == '1'   % if positive sign
+%             block.OutputPort(1).Data = str2num(DSXval);
 %             block.OutputPort(2).Data = str2num(DSXsign);
-        elseif DSXsign == '0'   % if negative sign
-            block.OutputPort(1).Data = -str2num(DSXval);
+%         elseif DSXsign == '0'   % if negative sign
+%             block.OutputPort(1).Data = -str2num(DSXval);
 %             block.OutputPort(2).Data = str2num(DSXsign);
-        end
+%         end
 %         block.OutputPort(2).Data = DSXval;
     end    
 function Terminate(block)

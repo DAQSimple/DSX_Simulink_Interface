@@ -36,15 +36,22 @@ function setup(block)
 function InitializeConditions(block)
     Serial_Config_callback('init');
     flush(evalin('base','DSX'));  
+    
 function Outputs(block)  
     loc = block.DialogPrm(1).Data;
     temp=[]; %will be what we send as a request to DSX
     %% Determine output based on case
-
-    temp = str2num(strcat(num2str(17),num2str(loc),'000000')); %no zero added as number has 2 digits
-
-    [DSXval,DSXsign] = Serial_Receive_callback('getval',temp);
+    if length(num2str(loc)) == 1
+%         temp = str2num(strcat(num2str(17),'0',num2str(loc),'000004'));
+        temp = strcat(num2str(17),'0',num2str(loc),'000004');
+    elseif length(num2str(loc)) == 2
+        temp = strcat(num2str(17),num2str(loc),'000004');
+    end
     
+    assignin('base','EncoderReadCommandSent',temp);
+    [DSXval,DSXsign] = Serial_Receive_callback('getval',temp);
+    assignin('base','EncoderReadVal',DSXval);
+    assignin('base','EncoderReadSign',DSXsign);
     if ~isempty(DSXval)
         if DSXsign == '1'   % if positive sign
             block.OutputPort(1).Data = str2num(DSXval);

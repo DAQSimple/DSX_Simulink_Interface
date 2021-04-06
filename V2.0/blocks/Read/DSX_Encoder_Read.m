@@ -7,7 +7,7 @@ function setup(block)
 %     block.NumDialogPrms =2; % initial conditions; led off
     block.NumDialogPrms =1; % initial conditions; led off
     %% Register number of input and output ports
-    block.NumOutputPorts = 2;
+    block.NumOutputPorts = 1;
     %% Setup functional port properties to dynamically
     %% inherited.
 %     block.SetPreCompInpPortInfoToDynamic;
@@ -17,10 +17,10 @@ function setup(block)
     block.OutputPort(1).Dimensions       = 1;
     block.OutputPort(1).DatatypeID  = 0; % double -1: inherited
     block.OutputPort(1).Complexity  = 'Real';
-    block.OutputPort(2).SamplingMode = 'Sample'; 
-    block.OutputPort(2).Dimensions       = 1;
-    block.OutputPort(2).DatatypeID  = 0; % double -1: inherited
-    block.OutputPort(2).Complexity  = 'Real';
+%     block.OutputPort(2).SamplingMode = 'Sample'; 
+%     block.OutputPort(2).Dimensions       = 1;
+%     block.OutputPort(2).DatatypeID  = 0; % double -1: inherited
+%     block.OutputPort(2).Complexity  = 'Real';
 
 %% Set block sample time to inherited
     block.SampleTimes = [-1 0];
@@ -28,6 +28,7 @@ function setup(block)
     block.SimStateCompliance = 'DefaultSimState';
 %% Register methods (what functions we'll use)
     block.RegBlockMethod('InitializeConditions', @InitializeConditions);
+%     block.RegBlockMethod('Start', @Start);
     block.RegBlockMethod('Outputs', @Outputs);     % Required
     block.RegBlockMethod('Terminate', @Terminate); % Required
     %endfunction
@@ -42,16 +43,15 @@ function Outputs(block)
 
     temp = str2num(strcat(num2str(17),num2str(loc),'000000')); %no zero added as number has 2 digits
 
-
     [DSXval,DSXsign] = Serial_Receive_callback('getval',temp);
     
     if ~isempty(DSXval)
         if DSXsign == '1'   % if positive sign
             block.OutputPort(1).Data = str2num(DSXval);
-            block.OutputPort(2).Data = str2num(DSXsign);
+%             block.OutputPort(2).Data = str2num(DSXsign);
         elseif DSXsign == '0'   % if negative sign
             block.OutputPort(1).Data = -str2num(DSXval);
-            block.OutputPort(2).Data = str2num(DSXsign);
+%             block.OutputPort(2).Data = str2num(DSXsign);
         end
 %         block.OutputPort(2).Data = DSXval;
     end    

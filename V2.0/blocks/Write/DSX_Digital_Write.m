@@ -36,39 +36,40 @@ function DoPostPropSetup(block)
   
 % At the start of the simulation
 function InitializeConditions(block)
-    Serial_Config_callback('init'); % Ensure serial port connection 
-    % Flush serial buffer in case port already exists and buffer isnt empty 
-    flush(evalin('base','DSX'));
-    block.Dwork(1).Data = 1337; %initialize work vector as neither 0 or 1
-% Every time step
+%% When block is initialized
+    Serial_Config_callback('init'); 
+    block.Dwork(1).Data = 1337; %initialize work vector as a value that wont exist
+   
 function Start(block)
-    block.Dwork(1).Data = 1337; %initialize work vector as neither 0 or 1
-%     assignin('base','startDwork',block.Dwork(1).Data);
+    block.Dwork(1).Data = 1337; %initialize work vector as a value that wont exist
+
 function Update (block)
-%     assignin('base','Dworkupdate',block.Dwork(1).Data);
+%% Every Time step
     val = block.InputPort(1).Data; % Data input to block
+    %% Round to logic ON or OFF 
     if val >= 0.5  % 0 or 1
         val = 1;
     else
         val = 0;
     end
-    
-    if val ~= block.Dwork(1).Data % only send command if it's unique from last
+    %% only send command if it's unique from last
+    if val ~= block.Dwork(1).Data 
         Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, val));
         assignin('base','sentVal',val);
     end
+    %% save current value in work vector for next iteration
     block.Dwork(1).Data = val; % save current value for next update
-%     assignin('base','DworkVal',val);
-    
-% When program is stopped or the block is deleted
+
+
 function Terminate(block)
+%% When program is stopped or the block is deleted
     Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, 0)); % send final value, off
     flush(evalin('base','DSX'));
 
-% Convert pin# and input value into a DSX 10-bit command
+
 function command = toCommand(pin,val)
+%% Convert pin# and input value into a DSX 10-bit command
     if size(pin) == 1
         pin = strcat('0',pin);
     end
     command = sprintf('%i',str2num(strcat('10',pin,'1','000',num2str(val),'0')));
-%     assignin('base','digitalwritecommand',command);

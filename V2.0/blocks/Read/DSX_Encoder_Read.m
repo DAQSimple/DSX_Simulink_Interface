@@ -42,7 +42,6 @@ function Outputs(block)
     temp=[]; %will be what we send as a request to DSX
     %% Determine output based on case
     if length(num2str(loc)) == 1
-%         temp = str2num(strcat(num2str(17),'0',num2str(loc),'000004'));
         temp = strcat(num2str(17),'0',num2str(loc),'000004');
     elseif length(num2str(loc)) == 2
         temp = strcat(num2str(17),num2str(loc),'000004');
@@ -50,20 +49,10 @@ function Outputs(block)
     
     assignin('base','EncoderReadCommandSent',temp);
     [DSXval,DSXsign] = Serial_Receive_callback('getval',temp);
-    assignin('base','EncoderReadVal',DSXval);
-    assignin('base','EncoderReadSign',DSXsign);
+    
     if ~isempty(DSXval)
-        %% old code, implements sign to output value
         block.OutputPort(1).Data = str2num(DSXval);
         block.OutputPort(2).Data = str2num(DSXsign);
-%         if DSXsign == '1'   % if positive sign
-%             block.OutputPort(1).Data = str2num(DSXval);
-%             block.OutputPort(2).Data = str2num(DSXsign);
-%         elseif DSXsign == '0'   % if negative sign
-%             block.OutputPort(1).Data = -str2num(DSXval);
-%             block.OutputPort(2).Data = str2num(DSXsign);
-%         end
-%         block.OutputPort(2).Data = DSXval;
     end    
 function Terminate(block)
     flush(evalin('base','DSX'));

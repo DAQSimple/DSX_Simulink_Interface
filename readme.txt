@@ -4,7 +4,7 @@ in matlab console type:
 
 	>> pathtool
 
-Locate your V2.0 folder and select "Add folder with subfolders".
+Select "Add folder with subfolders", then locate and select your V2.0 folder.
 
 Save and close pathtool.
 

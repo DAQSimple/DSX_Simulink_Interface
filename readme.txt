@@ -10,6 +10,6 @@ Save and close pathtool.
 
 Next, open and run the slblocks.m script in the V2.0 folder.
 
-Lastly, open Simulink Library Browser, & on the left side of the browser, (over any library text) right click and refresh the library browser.
+If the DSX library doesn't already show up in the Simulink library, on the left side of the browser, (over any library text) right click and refresh the library browser.
 
-The DSX Library should then show up in the library browser, and is ready for use.
+The DSX Library should then show up in the library browser and is ready for use.

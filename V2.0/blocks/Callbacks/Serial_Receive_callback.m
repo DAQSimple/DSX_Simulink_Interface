@@ -46,32 +46,9 @@ end
                 end
             end  
         case 'read'
-%             % Accepts an input command of 10 digits to send to DSX, receives
-%             % ping back and stores in a MATLAB array as a buffer.
-%             
-%             % send command to simulink 
-%             Serial_Send_callback('send',spec)  
-% 
-%             % read value sent from DSX
-%             fromDSX = readline(evalin('base','DSX'));
-%             %% Convert to a number, gets rid of LF
-%             if ~isempty(fromDSX) 
-%                 fromDSX = str2num(fromDSX);
-%             else % if there was nothing to read, set to zero
-%                 fromDSX = 0;
-%             end
-%     
-%             %% Ensure the command is valid, else discard
-%             if fromDSX > 1000000000
-%                 fromDSXchar = num2str(fromDSX); % Make a char copy, makes ping indexable
-%                 if fromDSXchar(end-4:end-1)=='8888' % Value slots
-%                     %do nothing with ping, discard
-%                 else
-%                     sBuffer = evalin('base','sBuffer');   % import old serial buffer from base workspace
-%                     new_sBuffer = [sBuffer;fromDSX];      % add ping to end 
-%                     assignin('base','sBuffer',new_sBuffer); % update sBuffer in base workspace
-%                 end
-%             end
+
+            fromDSX = readline(evalin('base','DSX'));
+
         case 'getval'
             %% Accepts an input command of 10 digits to send to DSX, receives
             % ping back and returns the value and sign bits of ping

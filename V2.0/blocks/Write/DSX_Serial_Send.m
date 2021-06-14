@@ -5,7 +5,7 @@ function setup(block)
   block.NumDialogPrms =1; % initial conditions; led off
   
   %% Register number of input and output ports
-  block.NumInputPorts  = 1;
+  block.NumInputPorts  = 0;
   block.NumOutputPorts = 0;
   
   %% Setup functional port properties to dynamically
@@ -13,9 +13,9 @@ function setup(block)
   block.SetPreCompInpPortInfoToDynamic;
   block.SetPreCompOutPortInfoToDynamic;
  
-  block.InputPort(1).Dimensions        = 1;
-  block.InputPort(1).DirectFeedthrough = false;
-  
+%   block.InputPort(1).Dimensions        = 1;
+%   block.InputPort(1).DirectFeedthrough = false;
+%   
   %% Set block sample time to inherited
   block.SampleTimes = [-1 0];
   
@@ -46,18 +46,11 @@ function DoPostPropSetup(block)
 
 
 function InitializeConditions(block)
-  %% Initialize Dwork
-  block.Dwork(1).Data = block.DialogPrm(1).Data;    % safe value to send at the end of the simulation
-  block.Dwork(2).Data = block.InputPort(1).Data;    % save current
-  Serial_Config_callback('init');
-  flush(evalin('base','DSX'));
-  Serial_Send_callback('send',block.InputPort(1).Data);
-  
+    Serial_Config_callback('init');
 function Update (block)
-%     if block.Dwork(2).Data ~= block.InputPort(1).Data
-        Serial_Send_callback('send',block.InputPort(1).Data);
-%         block.Dwork(2).Data = block.InputPort(1).Data;
-%     end
+  %% Initialize Dwork
+       block.DialogPrm(1).Data;
+       Serial_Send_callback('send',block.Dwork(1).Data);
 
 function Terminate(block)
 Serial_Send_callback('send',string(block.DialogPrm(1).Data));

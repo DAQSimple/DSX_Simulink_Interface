@@ -34,22 +34,6 @@ function InitializeConditions(block)
 
 function Outputs(block)  
     loc = block.DialogPrm(1).Data;
-%     assignin('base','AnalogLocFromMask',loc)
-    switch loc
-        case 'A0'
-            loc = 20;
-        case 'A1'
-            loc = 21;
-        case 'A2'
-            loc = 22;
-        case 'A3'
-            loc = 23;
-        case 'A4'
-            loc = 24;
-        case 'A5'
-            loc = 25;
-    end
-%     assignin('base','AnalogLoc',loc)
     spec=[]; %will be what we send as a request to DSX
     %% Determine output based on case
     spec = str2num(strcat(num2str(13),num2str(loc),'000003')); %no zero added as number has 2 digits

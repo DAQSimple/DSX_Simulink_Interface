@@ -50,23 +50,25 @@ function Update (block)
     val = round(block.InputPort(1).DataAsDouble);
     if val > 1023
         val = 1023;
-    elseif val<0
-        val = 0;
+        sign = '0';
+    elseif val < -1023
+        val = -1023;
+        sign = '1';
     end
     
     % send command if it's different from the last sent, else nothing
     if val ~= block.Dwork(1).Data
-        Serial_Send_callback('send',toCommand('20', val,'20'));
+        Serial_Send_callback('send',toCommand('20',val,sign,'20'));
     end
     % save last value in work vector
     block.Dwork(1).Data = val; 
 
 function Terminate(block)
-    Serial_Send_callback('send',toCommand('20', 0,'20')); % send final value, off
+    Serial_Send_callback('send',toCommand('20', 0,'0','20')); % send final value, off
     flush(evalin('base','DSX'));
     %endfunction
 
-function command = toCommand(pin,val,func)
+function command = toCommand(pin,val,sign,func)
     % assignin('base','pin',pin);
     % assignin('base','val',val);
 
@@ -86,4 +88,4 @@ function command = toCommand(pin,val,func)
         case 4
             val = val;
     end
-    command = sprintf('%i',str2num(strcat(func,pin,'1',val,'0')));
+    command = sprintf('%i',str2num(strcat(func,pin,sign,val,'0')));

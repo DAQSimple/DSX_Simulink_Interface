@@ -42,12 +42,13 @@ function Outputs(block)
     temp=[]; %will be what we send as a request to DSX
     %% Determine output based on case
     if length(num2str(loc)) == 1
-        temp = strcat(num2str(17),'0',num2str(loc),'000004');
+        temp = strcat('17','0',num2str(loc),'000004');
     elseif length(num2str(loc)) == 2
-        temp = strcat(num2str(17),num2str(loc),'000004');
+        temp = strcat('17',num2str(loc),'000004');
     end
+  
+    %assignin('base','EncoderReadCommandSent',temp);
     
-    assignin('base','EncoderReadCommandSent',temp);
     [DSXval,DSXsign] = Serial_Receive_callback('getval',temp);
     
     if ~isempty(DSXval)

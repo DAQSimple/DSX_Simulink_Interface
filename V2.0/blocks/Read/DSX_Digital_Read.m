@@ -33,16 +33,16 @@ function InitializeConditions(block)
 
 function Outputs(block)  
     loc = block.DialogPrm(1).Data;
-    temp=[]; %will be what we send as a request to DSX
+    pingreq=[]; %will be what we send as a request to DSX
     %% Determine output based on case
 
     if loc<10 
-        temp = str2num(strcat(num2str(110),num2str(loc),'000000')); %add zero to pin location
+        pingreq = str2num(strcat(num2str(110),num2str(loc),'000000')); %add zero to pin location
     else
-        temp = str2num(strcat(num2str(11),num2str(loc),'000000')); %no zero added as number has 2 digits
+        pingreq = str2num(strcat(num2str(11),num2str(loc),'000000')); %no zero added as number has 2 digits
     end
 
-    DSXval = Serial_Receive_callback('getval',temp);
+    DSXval = Serial_Receive_callback('getval',pingreq);
     
     if ~isempty(DSXval)
         block.OutputPort(1).Data = str2num(DSXval);

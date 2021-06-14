@@ -6,10 +6,12 @@ in matlab console type:
 
 Select "Add folder with subfolders", then locate and select your V2.0 folder.
 
-Save and close pathtool.
+Apply and save and all the good stuff and close pathtool.
+
 
 Next, open and run the slblocks.m script in the V2.0 folder.
 
+
 If the DSX library doesn't already show up in the Simulink library, on the left side of the browser, (over any library text) right click and refresh the library browser.
 
-The DSX Library should then show up in the library browser and is ready for use.
+The DSX Library should then show up in the library browser you're good to go.

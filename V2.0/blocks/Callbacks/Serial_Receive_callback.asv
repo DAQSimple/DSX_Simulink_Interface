@@ -57,7 +57,7 @@ end
             fromDSXchar = readline(evalin('base','DSX'));
        
             %% if the ping wasnt empty, process ping
-            if ~isempty(fromDSXchar)
+            if ~isempty(fromDSX)
                 fromDSXnum=str2num(fromDSXchar);
             %% Store command in buffer if valid, else discard
                 if fromDSXnum > 1000000000
@@ -79,7 +79,7 @@ end
                         
                         % Are there pings of that command type in buffer
                         locInBuffer=find(new_sBuffer(:,(1:2))==cmd); 
-                        assignin('base', 'locInBuffer',locInBuffer);
+                        assignin('base', 
                         %% If ping(s) we want are in buffer
                         if ~isempty(locInBuffer)
                             % Get oldest value from buffer

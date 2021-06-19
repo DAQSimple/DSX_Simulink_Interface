@@ -1,7 +1,7 @@
 function Serial_Config_callback(command,com,baud)
 %% Input checks
 initBaud = 115200;
-timeOutString = 'DSX.Timeout = 1';
+timeOutString = 'DSX.Timeout = 1e-3';
 [ports,numports] = Serial_Get_Ports();  % get list of all com ports
 likely_com = ports(numports);           % guess that the device is the last com port
 %% Check globals
@@ -42,7 +42,7 @@ end
             DSXexist = ismember('DSX',[w(:).name]);
             if DSXexist>0
                 %nothing
-                flush(evalin('base','DSX'));   
+                %flush(evalin('base','DSX'));   
 %                 dispp('A connection is already established.');
             else
                

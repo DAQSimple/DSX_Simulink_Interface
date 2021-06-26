@@ -56,7 +56,6 @@ function Outputs(block)
     lastval = block.Dwork(1).Data;
     
     if DSXstruct.loc == block.DialogPrm(1).Data & str2num(DSXstruct.val) ~= lastval
-        assignin('base','ANALOG_READ_STRUCT', DSXstruct);
         VAL = str2num(DSXstruct.val);
         block.OutputPort(1).Data = VAL;
         block.Dwork(1).Data = VAL;

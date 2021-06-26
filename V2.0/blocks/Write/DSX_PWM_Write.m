@@ -56,27 +56,34 @@ function InitializeConditions(block)
     
 function Start(block)
     block.Dwork(1).Data = 1337; %initialize work vector as a value that wont exist
-    firstFREQ = round(block.InputPort(2).DataAsDouble);     
+    firstFREQ = round(block.InputPort(2).DataAsDouble); % check their input frequency    
     
     if firstFREQ == 0 || firstFREQ < 0
+        %% set default frequency to the mask drop down
         defaultFREQ = str2num(block.DialogPrm(2).Data);
-        
+        %% set first frequency to be sent to be defaalt
         firstFREQ = defaultFREQ;
-        
+        %% send freq ping to DSX
         setFreq(block,firstFREQ);
     end
-   block.Dwork(2).Data = firstFREQ; 
-    
+   block.Dwork(2).Data = firstFREQ; % save in work vector for changes
+   %% Read input value
+   val = round(block.InputPort(1).DataAsDouble);
+   %% Send PWM value off the bat
+   Serial_Send_callback('send',toCommand('14',block.DialogPrm(1).Data,'1', val,'0'));
+   %% store input value in work vector
+   block.Dwork(1).Data = val;
 function Update (block)
     %% Send user input value as PWM duty cycle to DSX
+    % read frequency on input port 2
     FREQ = round(block.InputPort(2).DataAsDouble);
-    if FREQ ~= block.Dwork(2).Data 
+    if FREQ ~= block.Dwork(2).Data && FREQ ~= 0
         setFreq(block,FREQ); % update the frequency if it's been changed on input 2
     end
     
     val = round(block.InputPort(1).DataAsDouble); % read input port 1 : VAL
     if val > 100
-        val = 100;                                                                                                                             
+        val = 100;    % within 0 and 100                                                                                                                         
     elseif val < 0
         val = 0;
     end
@@ -84,7 +91,7 @@ function Update (block)
     if val ~= block.Dwork(1).Data
         Serial_Send_callback('send',toCommand('14',block.DialogPrm(1).Data,'1', val,'0'));
     end
-    % save last value in work vector
+    % save last values in work vector
     block.Dwork(1).Data = val; 
     block.Dwork(2).Data = FREQ;
 

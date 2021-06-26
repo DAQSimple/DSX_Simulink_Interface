@@ -1,47 +1,111 @@
-function [fromDSX,fromDSXsign] = Serial_Receive_callback(command,spec)
+function [fromDSX,fromDSXsign,fromDSXstruct] = Serial_Receive_callback(command,spec)
 %% Ensure DSX exists
 % Serial_Config_callback('init')
 
 %% Checks
+
 w=evalin('base','whos');
-% exist_sBuffer = ismember('sBuffer',[w(:).name]);
+exist_sBuffer = ismember('sBuffer',[w(:).name]);
+% exist_sBuffer = ismember('dsx_struct',[w(:).name]);
 % exist_sBuffer = exist('sBuffer');
 
 if ~exist('spec')
     spec = [];
 end
+
 if isstring(spec)
    spec = char(spec); 
 elseif isnumeric(spec)
     spec=num2str(spec);
 end
+%% Define current command in a struct
+
+    ping.cmd = spec(1:2);
+    ping.loc = spec(3:4);
+    ping.sign = spec(5);
+    ping.val = spec(6:9);
+    ping.ret = spec(10);
+    
+    fromDSXstruct.cmd = '00';
+    fromDSXstruct.loc = '00';
+    fromDSXstruct.sign = '0';
+    fromDSXstruct.val = '0000';
+    fromDSXstruct.ret = '0';
 % if exist_sBuffer>0
 
-if ~exist('sBuffer')
-    assignin('base','sBuffer','');
+if exist_sBuffer  
+    evalin('base','sBuffer');
+else
+    assignin('base','sBuffer',[]);
 end
+fromDSX = 0;
+fromDSXsign = '0';
 %% Commands
     switch command
         % no input needed, only specify 'read' 
         case 'readnext'
+            %% Ask DSX for value 
+            Serial_Send_callback('send',spec);
             %% Read next line in serial buffer
-            fromDSXchar = readline(evalin('base','DSX'));
+            fromDSXchar = char(readline(evalin('base','DSX')));
             %% Convert to a number, gets rid of LF
             try 
-                fromDSXnum = str2num(fromDSX);
+                fromDSXnum = str2num(fromDSXchar);
+                fromDSX = fromDSXnum;
             catch % if there was nothing to read, do nothing
+                fromDSXnum = 0;
+                fromDSX = 0;
             end 
             %% Ensure the command is valid, else discard
-            if fromDSXnum > 1000000000
-                if fromDSXchar(end-4:end-1)=='8888' % Value slots
-                    %do nothing with ping, discard
-                else
+            if fromDSXnum > 1000000000 & numel(fromDSXchar) > 1
+%                 if fromDSXchar(end-4:end-1)=='8888' % Value slots
+%                     %do nothing with ping, discard
+%                 else
                     fromDSXsign = fromDSXchar(end-5);
                     sBuffer = evalin('base','sBuffer');   % import old serial buffer from base workspace
-                    new_sBuffer = [sBuffer;fromDSX];      % add ping to end 
+                    new_sBuffer = [sBuffer;fromDSXchar];      % add ping to end 
                     assignin('base','sBuffer',new_sBuffer); % update sBuffer in base workspace
+%                 end 
+            end 
+           
+            
+        case 'checkBuffer'
+            % import old serial buffer from base workspace
+            sBuffer = evalin('base','sBuffer');        
+
+            % Are there pings of that command type in buffer
+            if ~isempty(sBuffer)
+            	locInBuffer=find(sBuffer(:,(1:2))==ping.cmd);   
+            else 
+                locInBuffer = [];
+            end
+            %% If ping(s) we want are in buffer
+            if ~isempty(locInBuffer)
+                %% Grab oldest buffer value
+                pullCmd = sBuffer(locInBuffer(1),:);
+                          
+                pullCmdChar = pullCmd; % Idk why this exists, pullCmd and pullCmdchar are more chars
+                %% Output data if the LOC is correct
+                if pullCmdChar(3:4) == ping.loc % if the LOC values are consistent,
+                    
+                    fromDSXstruct.loc = pullCmdChar(3:4);
+                    fromDSXstruct.cmd = pullCmdChar(1:2);    
+                    fromDSXstruct.sign = pullCmdChar(5);
+                    fromDSXstruct.val = pullCmdChar(6:9);
+                    fromDSXstruct.ret = pullCmdChar(10);
+
+                    % send ping out
+                    fromDSX = str2num(pullCmd);
+                    fromDSXsign = fromDSXstruct.sign;
+
+                    % Remove pulled value from buffer
+                    sBuffer = sBuffer(sBuffer ~= pullCmd);
+                    assignin('base','sBuffer',sBuffer); % update sBuffer in base workspace
                 end
-            end  
+            else
+                fromDSX = 0;
+            end
+        
         case 'read'
 
             fromDSX = readline(evalin('base','DSX'));

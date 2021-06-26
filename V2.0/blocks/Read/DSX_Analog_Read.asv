@@ -38,13 +38,11 @@ function Outputs(block)
     %% Determine output based on case
     spec = str2num(strcat(num2str(13),num2str(loc),'000003')); %no zero added as number has 2 digits
     
-    Serial_Receive_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
-    [fromDSX, DSXsign, DSXstruct] = Serial_Receive_callback('checkBuffer',spec); % this reads only the buffer and checks for commands, updates variables
+    [fromDSX, DSXsign, DSXstruct] = Serial_Receive_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
+    [fromDSX, DSXsign, DSXstruct] = Serial_Receive_callback('checkbuffer',spec); % this reads only the buffer and checks for commands, updates variables
     
-    
-    
-    if DSXstruct.loc == block.DialogPrm(1).Data
-        assignin('base','ANALOG_READ_STRUCT', DSXstruct);
+    assigninbase(
+    if ~isempty(DSXstruct.val)  
         block.OutputPort(1).Data = str2num(DSXstruct.val);
     end    
 function Terminate(block)

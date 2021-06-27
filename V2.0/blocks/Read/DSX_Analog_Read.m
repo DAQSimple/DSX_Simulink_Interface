@@ -19,7 +19,7 @@ function setup(block)
     block.OutputPort(1).Complexity  = 'Real';
     
 %% Set block sample time to inherited
-    block.SampleTimes = [-1 0];
+    block.SampleTimes = [-1, 0];
     
 %% Set the block simStateCompliance to default (i.e., same as a built-in block)
     block.SimStateCompliance = 'DefaultSimState';
@@ -47,7 +47,7 @@ function DoPostPropSetup(block)
 function Outputs(block)  
     loc = block.DialogPrm(1).Data; 
     %% Serial
-    spec = strcat(num2str(13),num2str(loc),'000003');
+    spec = strcat(num2str(13),num2str(loc),'000000');
     DSX_Read_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
     ping = DSX_Read_callback('checkBuffer',spec); % this reads only the buffer and checks for commands, updates variables
     %% Check Ping

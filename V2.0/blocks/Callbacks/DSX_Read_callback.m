@@ -27,7 +27,7 @@ pingOut = '0';
             %% Read next line in serial buffer
             pingOut = char(readline(evalin('base','DSX')));
             %% Ensure the command is valid, else discard
-            if pingOut(1) >= 1 % is the first bit not 0 a.k.a its a command
+            if numel(pingOut)>9
                     new_sBuffer = [sBuffer;pingOut];      % add ping to end 
                     assignin('base','sBuffer',new_sBuffer); % update sBuffer in base workspace
             end        

@@ -41,7 +41,7 @@ function Outputs(block)
     else
         pingreq = str2num(strcat(num2str(11),num2str(loc),'000000')); %no zero added as number has 2 digits
     end
-
+    
     DSXval = Serial_Receive_callback('getval',pingreq);
     
     if ~isempty(DSXval)

@@ -7,8 +7,8 @@ function a = Serial_Send_callback(command,message)
         command = 'null';
         dispp('command not valid');
     end
-    if isnumeric(message)
-        message=num2str(message);
+    if ~ischar(message)
+        message=char(message);
     end
 
 %% Commmands   

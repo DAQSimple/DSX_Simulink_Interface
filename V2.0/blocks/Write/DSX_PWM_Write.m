@@ -120,7 +120,7 @@ function command = toCommand(func,pin,sign,val,ret)
         case 4
             val = val;
     end
-    command = sprintf('%i',str2num(strcat(func,pin,sign,val,ret)));
+    command = strcat(func,pin,sign,val,ret);
     
 function setFreq(block,freq)
     %% set PWM frequency once at start of simulation

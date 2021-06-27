@@ -45,20 +45,16 @@ function DoPostPropSetup(block)
     flush(evalin('base','DSX'));
     block.Dwork(1).Data = 9999; 
 function Outputs(block)  
-    loc = block.DialogPrm(1).Data;
-    spec=[]; %will be what we send as a request to DSX
-    %% Determine output based on case
-    spec = str2num(strcat(num2str(13),num2str(loc),'000003')); %no zero added as number has 2 digits
-    
+    loc = block.DialogPrm(1).Data; 
+    spec = str2num(strcat(num2str(13),num2str(loc),'000003'));
     Serial_Receive_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
     [fromDSX, DSXsign, DSXstruct] = Serial_Receive_callback('checkBuffer',spec); % this reads only the buffer and checks for commands, updates variables
+%     lastval = block.Dwork(1).Data;
     
-    lastval = block.Dwork(1).Data;
-    
-    if DSXstruct.loc == block.DialogPrm(1).Data & str2num(DSXstruct.val) ~= lastval
+    if DSXstruct.loc == block.DialogPrm(1).Data
         VAL = str2num(DSXstruct.val);
         block.OutputPort(1).Data = VAL;
-        block.Dwork(1).Data = VAL;
+%         block.Dwork(1).Data = VAL;
     end    
 function Terminate(block)
     flush(evalin('base','DSX'));

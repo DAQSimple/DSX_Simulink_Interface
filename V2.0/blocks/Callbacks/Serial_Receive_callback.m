@@ -1,4 +1,4 @@
-function [fromDSX,fromDSXsign,fromDSXstruct] = Serial_Receive_callback(command,spec)
+function [output] = Serial_Receive_callback(command,spec)
 %% Ensure DSX exists
 % Serial_Config_callback('init')
 
@@ -19,26 +19,14 @@ elseif isnumeric(spec)
     spec=num2str(spec);
 end
 %% Define current command in a struct
-
-    ping.cmd = spec(1:2);
-    ping.loc = spec(3:4);
-    ping.sign = spec(5);
-    ping.val = spec(6:9);
-    ping.ret = spec(10);
-    
-    fromDSXstruct.cmd = '00';
-    fromDSXstruct.loc = '00';
-    fromDSXstruct.sign = '0';
-    fromDSXstruct.val = '0000';
-    fromDSXstruct.ret = '0';
-% if exist_sBuffer>0
+    [id,loc,sign,val,ret] = splitping(spec);  
 
 if exist_sBuffer  
     evalin('base','sBuffer');
 else
     assignin('base','sBuffer',[]);
 end
-fromDSX = 0;
+fromDSX = '0';
 fromDSXsign = '0';
 %% Commands
     switch command
@@ -47,25 +35,14 @@ fromDSXsign = '0';
             %% Ask DSX for value 
             Serial_Send_callback('send',spec);
             %% Read next line in serial buffer
-            fromDSXchar = char(readline(evalin('base','DSX')));
+            fromDSX = char(readline(evalin('base','DSX')));
             %% Convert to a number, gets rid of LF
-            try 
-                fromDSXnum = str2num(fromDSXchar);
-                fromDSX = fromDSXnum;
-            catch % if there was nothing to read, do nothing
-                fromDSXnum = 0;
-                fromDSX = 0;
-            end 
+            fromDSXnum = str2num(fromDSX);
             %% Ensure the command is valid, else discard
-            if fromDSXnum > 1000000000 & numel(fromDSXchar) > 1
-%                 if fromDSXchar(end-4:end-1)=='8888' % Value slots
-%                     %do nothing with ping, discard
-%                 else
-                    fromDSXsign = fromDSXchar(end-5);
+            if fromDSX(1) >= 1 % is the first bit not 0 a.k.a its a command
                     sBuffer = evalin('base','sBuffer');   % import old serial buffer from base workspace
                     new_sBuffer = [sBuffer;fromDSXchar];      % add ping to end 
                     assignin('base','sBuffer',new_sBuffer); % update sBuffer in base workspace
-%                 end 
             end 
            
             

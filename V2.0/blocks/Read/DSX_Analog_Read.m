@@ -46,13 +46,13 @@ function DoPostPropSetup(block)
     block.Dwork(1).Data = 9999; 
 function Outputs(block)  
     loc = block.DialogPrm(1).Data; 
-    spec = str2num(strcat(num2str(13),num2str(loc),'000003'));
-    Serial_Receive_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
-    [fromDSX, DSXsign, DSXstruct] = Serial_Receive_callback('checkBuffer',spec); % this reads only the buffer and checks for commands, updates variables
-%     lastval = block.Dwork(1).Data;
+    spec = strcat(num2str(13),num2str(loc),'000003');
+    DSX_Read_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
+    ping = DSX_Read_callback('checkBuffer',spec); % this reads only the buffer and checks for commands, updates variables
+    [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping);
     
-    if DSXstruct.loc == block.DialogPrm(1).Data
-        VAL = str2num(DSXstruct.val);
+    if pingloc == block.DialogPrm(1).Data
+        VAL = str2num(pingval);
         block.OutputPort(1).Data = VAL;
 %         block.Dwork(1).Data = VAL;
     end    

@@ -1,4 +1,4 @@
-function [id, loc, sign, val, ret] = pingtocmd(ping)
+function [id, loc, sign, val, ret] = splitping(ping)
 %{
 Converts an input number or string or char or something, converts to char,
 then outputs each value seperately.

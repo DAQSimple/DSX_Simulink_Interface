@@ -2,7 +2,7 @@ function [pingOut] = DSX_Read_callback(command,spec)
 %% Checks
 w=evalin('base','whos');
 exist_sBuffer = ismember('sBuffer',[w(:).name]);
-exist_DSX = ismember('sBuffer',[w(:).name]);
+exist_DSX = ismember('DSX',[w(:).name]);
 % exist_sBuffer = ismember('dsx_struct',[w(:).name]);
 % exist_sBuffer = exist('sBuffer');
 if ~exist('spec')
@@ -39,27 +39,14 @@ pingOut = '0';
                     assignin('base','sBuffer',new_sBuffer); % update sBuffer in base workspace
             end        
         case 'checkBuffer'   
-            % Are there pings of that command type in buffer
-            if ~isempty(sBuffer)
-            	locInBuffer=find(sBuffer(:,(1:2))==id);   
-            else 
-                locInBuffer = [];
-            end
             %% If ping(s) we want are in buffer
-            if ~isempty(locInBuffer)
-                %% Grab oldest buffer value
-                pullCmd = sBuffer(locInBuffer(1),:);        
-                %% pingOut data if the LOC is correct
-                if pullCmd(3:4) == loc % if the LOC values are consistent,
-                    pingOut = pullCmd;
-                    % Remove pulled value from buffer
-                    sBuffer = sBuffer(sBuffer ~= pullCmd);
-                    assignin('base','sBuffer',sBuffer); % update sBuffer in base workspace
-                end
-            else
-                pingOut = '0';
+            [index,pingOut] = inBuffer(sBuffer, id, loc);
+            if index >0
+                %% clear sBuffer of that ping
+%                 sBuffer = sBuffer(sBuffer ~= sBuffer(:,index));
+                sBuffer(index,:) = []
+                assignin('base','sBuffer',sBuffer); % update sBuffer in base workspace     
             end
-        
         case 'read'
             pingOut = readline(evalin('base','DSX'));       
     end

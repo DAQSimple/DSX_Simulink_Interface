@@ -1,0 +1,21 @@
+function [index] = inBuffer(sBuffer, id, loc)
+
+for i = 1:size(sBuffer,1)
+    if sBuffer(i,1:2) == id
+        if sBuffer(i,3:4) == loc)
+            index = i;
+            break;
+        end
+    end      
+end
+
+if ~isempty(locInBuffer)
+                %% Grab oldest buffer value
+                pullCmd = sBuffer(locInBuffer(1),:);        
+                %% pingOut data if the LOC is correct
+                if pullCmd(3:4) == loc % if the LOC values are consistent,
+                    pingOut = pullCmd;
+                    % Remove pulled value from buffer
+                    sBuffer = sBuffer(sBuffer ~= pullCmd);
+                    assignin('base','sBuffer',sBuffer); % update sBuffer in base workspace
+                end

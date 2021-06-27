@@ -51,14 +51,12 @@ function Outputs(block)
     DSX_Read_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
     ping = DSX_Read_callback('checkBuffer',spec); % this reads only the buffer and checks for commands, updates variables
     %% Check Ping
-    if ~isempty(ping) & ping ~= '0' % not empty & 0
+    if numel(ping)>1 % not empty & 0
         [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping); 
         if pingloc == loc
             VAL = str2num(pingval);
-            if ~ismatrix(VAL)
                 assignin('base','AreadVAL',VAL);
                 block.OutputPort(1).Data = double(VAL);
-            end
         end
     end
 function Terminate(block)

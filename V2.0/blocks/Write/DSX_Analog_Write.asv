@@ -39,23 +39,23 @@ function DoPostPropSetup(block)
 
 function InitializeConditions(block)
     Serial_Config_callback('init');
-    block.Dwork(1).Data = 9999; %initialize work vector as a value that wont exist
+    block.Dwork(1).Data = 1337; %initialize work vector as a value that wont exist
     
 function Start(block)
-    block.Dwork(1).Data = 9999; %initialize work vector as a value that wont exist
+    block.Dwork(1).Data = 1337; %initialize work vector as a value that wont exist
     
 function Update(block)
     %% Send user input value as PWM duty cycle to DSX
     val = round(block.InputPort(1).DataAsDouble);
     sign = '0';
-    if val > 2048
+    if val > 1023
         val = 4095;
     elseif val >= 0
-        val = val + 2048; % scale by 2 to fit in 2048 bits, positive half of DSX 4096 value
-    elseif val > -2048
-        val = val + 2048; % scale by 2 to fit in 2048 bits, negative half of DSX 4096 value
+        val = 2*val + 4094/2; % scale by 2 to fit in 2048 bits, positive half of DSX 4096 value
+    elseif val > -1023
+        val = abs(2*val); % scale by 2 to fit in 2048 bits, negative half of DSX 4096 value
         sign = '1';
-    elseif val < -2048
+    elseif val < -1023
         val = 0;
         sign = '1';
     end

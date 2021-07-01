@@ -77,14 +77,15 @@ function Update (block)
     %% Send user input value as PWM duty cycle to DSX
     % read frequency on input port 2
     FREQ = round(block.InputPort(2).DataAsDouble);
-    if FREQ ~= block.Dwork(2).Data && FREQ ~= 0
+    if FREQ ~= block.Dwork(2).Data && FREQ > 0
         setFreq(block,FREQ); % update the frequency if it's been changed on input 2
     end
     
     val = round(block.InputPort(1).DataAsDouble); % read input port 1 : VAL
+    
     if val > 100
         val = 100;    % within 0 and 100                                                                                                                         
-    elseif val < 0
+    elseif val <= 0
         val = 0;
     end
     % send command if it's different from the last sent, else nothing
@@ -101,9 +102,6 @@ function Terminate(block)
     %endfunction
 
 function command = toCommand(func,pin,sign,val,ret)
-    % assignin('base','pin',pin);
-    % assignin('base','val',val);
-
     %% Assign leading zero to pin value if necessary
     if length(pin) == 1
         pin = strcat('0',pin);
@@ -124,20 +122,18 @@ function command = toCommand(func,pin,sign,val,ret)
     
 function setFreq(block,freq)
     %% set PWM frequency once at start of simulation
-    freqs = num2str(freq); % convert freq to string array
+    % freq : numerical frequency value
+    freqs = num2str(freq); % FREQUENCY STRING
     freq_digits = numel(freqs); % number of elements in array
     
     if freq_digits > 4  % handles 9999+ case, 1 bit too large
-      sign = 1;
-      freqs = freqs(1:end-1);
-      ret = freqs(end);
+      sign = '1';
+      ret = freqs(end);         % send LSB over ret
+      freqs = freqs(1:end-1);   % send 4 MSB in val
       Serial_Send_callback('send',toCommand('15', block.DialogPrm(1).Data, sign, freqs, ret)); %shrink down to 4 bits
     else
         % send command to PIN with FREQ input value and SIGN = 0
-      sign = 0;
-      ret = 0;
+      sign = '0';
+      ret = '0'; % nothing in ret, send FREQ in val
       Serial_Send_callback('send',toCommand('15', block.DialogPrm(1).Data, sign, freqs, ret))
     end
-    
-    % set VAL as out of bounds
-    block.Dwork(1).Data = 1337;

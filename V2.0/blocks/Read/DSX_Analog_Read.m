@@ -47,7 +47,7 @@ function DoPostPropSetup(block)
 function Outputs(block)  
     loc = block.DialogPrm(1).Data; 
     %% Serial
-    spec = strcat(num2str(13),num2str(loc),'000000');
+    spec = strcat('13', num2str(loc), '000000');
     DSX_Read_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
     ping = DSX_Read_callback('checkBuffer',spec); % this reads only the buffer and checks for commands, updates variables
     assignin('base','A0ping',ping);
@@ -59,7 +59,7 @@ function Outputs(block)
 %                 assignin('base','AreadVAL',VAL);
                 block.OutputPort(1).Data = double(VAL);
         end
-    end
+    end  
 function Terminate(block)
     flush(evalin('base','DSX'));
 %endfunction

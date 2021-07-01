@@ -13,7 +13,7 @@ end
 if ~exist('command')
     command = [];
 else 
-    command = char(lower(command)); % its char for sure now
+    spec = char(spec); % its char for sure now
 end
 %% Define current command in a struct
 [id,loc,sign,val,ret] = splitping(spec);  

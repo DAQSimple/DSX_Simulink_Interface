@@ -1,4 +1,4 @@
-function [output] = Serial_Receive_callback(command,spec)
+function [fromDSX,fromDSXsign] = Serial_Receive_callback(command,spec)
 %% Ensure DSX exists
 % Serial_Config_callback('init')
 
@@ -99,10 +99,10 @@ fromDSXsign = '0';
        
             %% if the ping wasnt empty, process ping
             if ~isempty(fromDSXchar)
-                fromDSXnum=str2num(fromDSXchar);
+                
             %% Store command in buffer if valid, else discard
-                if fromDSXnum > 1000000000
-                    % Convert from strin to char              
+                if numel(fromDSXchar)>8
+
                     fromDSXval = fromDSXchar(end-4:end-1);            
                     if fromDSXval=='8888' % Ignore if value is 8888
                         %do nothing with ping, discard
@@ -112,31 +112,22 @@ fromDSXsign = '0';
                         
                         % add ping to end
                         new_sBuffer = [sBuffer;fromDSXchar];
-                        %debug
-                        assignin('base','new_sBuffer',new_sBuffer);
-                        
+
                         % what command are we looking for the value of?
-                        cmd = spec(1:2);
+                        id = spec(1:2); 
+                        loc = spec(3:4);
                         
-                        % Are there pings of that command type in buffer
-                        locInBuffer=find(new_sBuffer(:,(1:2))==cmd); 
-                        assignin('base', 'locInBuffer',locInBuffer);
-                        %% If ping(s) we want are in buffer
-                        if ~isempty(locInBuffer)
-                            % Get oldest value from buffer
-                            pullPing = new_sBuffer(locInBuffer(1),:);
-                            assigninbase('base','monitoringwithmanraj',pullPing);
-                            
-                            % Convert to char for indexing
-                            pullPingchar = num2str(pullPing);
+                        [index,pingOut] = inBuffer(new_sBuffer, id, loc);
+                        
+                        if index > 0
+                            %% clear sBuffer of that ping
+                            new_sBuffer(index,:) = [];
+                            assignin('base','sBuffer',new_sBuffer); % update sBuffer in base workspace     
+                        end
                             
                             % FINALLY extract value from ping
-                            fromDSX = pullPingchar(end-4:end-1);
-                            fromDSXsign = pullPingchar(end-5);
-                            % Remove pulled value from buffer
-                            new_sBuffer = new_sBuffer(new_sBuffer ~= pullValue);
-                        end
-                        assignin('base','sBuffer',new_sBuffer); % update sBuffer in base workspace
+                        fromDSX = pingOut(end-4:end-1);
+                        fromDSXsign = pullPingchar(end-5);
                     end
                 end
 

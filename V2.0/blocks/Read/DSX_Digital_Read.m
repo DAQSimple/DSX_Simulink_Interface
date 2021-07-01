@@ -19,7 +19,7 @@ function setup(block)
     block.OutputPort(1).Complexity  = 'Real';
 
 %% Set block sample time to inherited
-    block.SampleTimes = [-1 0];
+    block.SampleTimes = [0.001 0];
 %% Set the block simStateCompliance to default (i.e., same as a built-in block)
     block.SimStateCompliance = 'DefaultSimState';
 %% Register methods (what functions we'll use)
@@ -36,10 +36,10 @@ function Outputs(block)
     pingreq=[]; %will be what we send as a request to DSX
     %% Determine output based on case
 
-    if loc<10 
-        pingreq = str2num(strcat(num2str(110),num2str(loc),'000000')); %add zero to pin location
+    if str2num(loc)<10 
+        pingreq = strcat(num2str(110),loc,'000000'); %add zero to pin location
     else
-        pingreq = str2num(strcat(num2str(11),num2str(loc),'000000')); %no zero added as number has 2 digits
+        pingreq = strcat(num2str(11),loc,'000000'); %no zero added as number has 2 digits
     end
     
     DSXval = Serial_Receive_callback('getval',pingreq);

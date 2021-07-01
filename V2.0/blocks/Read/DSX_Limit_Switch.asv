@@ -68,20 +68,21 @@ function Outputs(block)
     val         = '0000';
     ret         = '0';  
     limit_init = toCommand(cmd,loc,emerg_state,val,ret); % make our beloved DSX ping variable
-    %% Read value and check buffer
-    ping = DSX_Read_callback('CHECKbuffer',limit_init); % use initial ping
-    [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping);
-    %% check
+    
+    ping = Serial_Receive_callback('checkBuffer',limit_init); % use initial ping
+    [id, loc, sign, val, ret] = splitping(ping);
     if ~isempty(ping) % if there was succesfully a CMD21 ping
-        if pingloc == loc % is it for this block?                
-            if pingsign == '0' 
+        if loc == num2str(block.DialogPrm(1).Data) % is it for this block?           
+            
+            if DSXstruct.sign == '0' 
                 % not crucial stop, execute commands
-                if pingret == '1' % write 1  
+                if DSXstruct.ret == '1' % write 1  
                     block.OutputPort(1).Data = 1;
-                elseif pingret == '0' % write 0
+                else DSXstruct.ret == '0' % write 0
                     block.OutputPort(1).Data = 0;
-                end              
-            elseif pingsign == '1'
+                end
+                
+            else DSXstruct.sign == '1'
                 % crucial stop, output bad and sit back
                 block.OutputPort(1).Data = 10;
             end
@@ -89,6 +90,6 @@ function Outputs(block)
     end
 function string = toCommand(cmd,loc,emerg_state,val,ret) % convert our inputs to a command, lovelyly
     string = strcat(cmd,'0',loc,emerg_state,val,ret); % add zero for ping loc as its only '7' not '07' 
-function Terminate()
+function Terminate(block)
     flush(evalin('base','DSX'));
 %endfunction

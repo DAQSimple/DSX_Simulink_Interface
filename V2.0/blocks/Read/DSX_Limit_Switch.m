@@ -26,7 +26,7 @@ function setup(block)
     block.RegBlockMethod('InitializeConditions', @InitializeConditions);
     block.RegBlockMethod('Start', @Start);
     block.RegBlockMethod('Outputs', @Outputs);     % Required
-    block.RegBlockMethod('Terminate', @Terminate); % Required
+%     block.RegBlockMethod('Terminate', @Terminate); % Required
     %endfunction
 
 function DoPostPropSetup(block)
@@ -89,6 +89,5 @@ function Outputs(block)
     end
 function string = toCommand(cmd,loc,emerg_state,val,ret) % convert our inputs to a command, lovelyly
     string = strcat(cmd,'0',loc,emerg_state,val,ret); % add zero for ping loc as its only '7' not '07' 
-function Terminate()
-    flush(evalin('base','DSX'));
+% function Terminate()
 %endfunction

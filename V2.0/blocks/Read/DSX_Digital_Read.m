@@ -19,7 +19,7 @@ function setup(block)
     block.OutputPort(1).Complexity  = 'Real';
 
 %% Set block sample time to inherited
-    block.SampleTimes = [0.001 0];
+    block.SampleTimes = [-1 0];
 %% Set the block simStateCompliance to default (i.e., same as a built-in block)
     block.SimStateCompliance = 'DefaultSimState';
 %% Register methods (what functions we'll use)

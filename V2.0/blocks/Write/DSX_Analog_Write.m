@@ -17,7 +17,7 @@ function setup(block)
     block.InputPort(1).DirectFeedthrough = true;
 
     %% Set block sample time to inherited
-    block.SampleTimes = [0.001 0];
+    block.SampleTimes = [-1 0];
 
     %% Set the block simStateCompliance to default (i.e., same as a built-in block)
     block.SimStateCompliance = 'DefaultSimState';

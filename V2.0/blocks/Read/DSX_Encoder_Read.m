@@ -39,22 +39,23 @@ function InitializeConditions(block)
     
 function Outputs(block)  
     loc = block.DialogPrm(1).Data;
-    temp=[]; %will be what we send as a request to DSX
+    spec=[]; %will be what we send as a request to DSX
     %% Determine output based on case
     if length(num2str(loc)) == 1
-        temp = strcat('17','0',num2str(loc),'000004');
+        spec = strcat('17','0',num2str(loc),'000004');
     elseif length(num2str(loc)) == 2
-        temp = strcat('17',num2str(loc),'000004');
+        spec = strcat('17',num2str(loc),'000004');
     end
-  
-    %assignin('base','EncoderReadCommandSent',temp);
     
-    [DSXval,DSXsign] = Serial_Receive_callback('getval',temp);
+    DSX_Read_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
+    ping = DSX_Read_callback('checkbuffer',spec); % this reads only the buffer and checks for commands, updates variables
     
-    if ~isempty(DSXval)
-        block.OutputPort(1).Data = str2num(DSXval);
-        block.OutputPort(2).Data = str2num(DSXsign);
-    end    
+    if numel(ping)>1 % not empty & 0
+        [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping); 
+        block.OutputPort(1).Data = str2num(pingval);
+        block.OutputPort(2).Data = str2num(pingsign);
+    end
+    
 function Terminate(block)
     flush(evalin('base','DSX'));
 %endfunction

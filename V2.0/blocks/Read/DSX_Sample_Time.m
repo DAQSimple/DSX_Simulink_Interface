@@ -1,11 +1,11 @@
-function DSX_Digital_Read(block)
+function DSX_Sample_Time(block)
 % Latest change: 3/17/2021
 % This function is the back end controlling the DSX Digital Read block.
 setup(block);
     %endfunction
 function setup(block)
 %     block.NumDialogPrms =2; % initial conditions; led off
-    block.NumDialogPrms =1; % initial conditions; led off
+    block.NumDialogPrms =0; % initial conditions; led off
     %% Register number of input and output ports
     block.NumOutputPorts = 1;
     %% Setup functional port properties to dynamically
@@ -28,33 +28,13 @@ function setup(block)
     block.RegBlockMethod('Terminate', @Terminate); % Required
     %endfunction
 function InitializeConditions(block)
-    Serial_Config_callback('init');
-    flush(evalin('base','DSX'));
-
+tic;
 function Outputs(block)  
-    loc = block.DialogPrm(1).Data;
-    pingreq=[]; %will be what we send as a request to DSX
-    %% Determine output based on case
-
-    if numel(loc)<2 
-        pingreq = strcat(num2str(110),loc,'000000'); %add zero to pin location
-    else
-        pingreq = strcat(num2str(11),loc,'000000'); %no zero added as number has 2 digits
-    end
-    
-    DSXval = Serial_Receive_callback('getval',pingreq);
-    
-    
-     DSX_Read_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
-    ping = DSX_Read_callback('checkbuffer',spec); % this reads only the buffer and checks for commands, updates variables
-    %% Check Ping
-    if numel(ping)>1 % not empty & 0
-        [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping); 
-    
-    if ~isempty(DSXval)
-        block.OutputPort(1).Data = str2num(DSXval);
-    end    
+elapsedTime = toc;
+block.OutputPort(1).Data = elapsedTime;
+tic;
 function Terminate(block)
-    flush(evalin('base','DSX'));
+toc;
+block.OutputPort(1).Data = elapsedTime;
 %endfunction
 

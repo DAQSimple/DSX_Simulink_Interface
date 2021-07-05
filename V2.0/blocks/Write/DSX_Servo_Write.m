@@ -98,4 +98,4 @@ switch size(val,2)
         val = strcat('0',val);
 end
 
-command = strcat('16',pin,'1',val,'0'); %convert from scientific
+command = strcat('16',pin,'1',val,'0');

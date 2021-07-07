@@ -69,19 +69,19 @@ function Outputs(block)
     ret         = '0';  
     limit_init = toCommand(cmd,loc,emerg_state,val,ret); % make our beloved DSX ping variable
     %% Read value and check buffer
-    ping = DSX_Read_callback('CHECKbuffer',limit_init); % use initial ping
+    ping = DSX_Read_callback('checkbuffer',limit_init); % use initial ping
     [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping);
     %% check
     if ~isempty(ping) % if there was succesfully a CMD21 ping
         if pingloc == loc % is it for this block?                
-            if pingsign == '0' 
+            if pingsign == '1' 
                 % not crucial stop, execute commands
                 if pingret == '1' % write 1  
                     block.OutputPort(1).Data = 1;
                 elseif pingret == '0' % write 0
                     block.OutputPort(1).Data = 0;
                 end              
-            elseif pingsign == '1'
+            elseif pingsign == '0'
                 % crucial stop, output bad and sit back
                 block.OutputPort(1).Data = 10;
             end

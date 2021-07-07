@@ -36,7 +36,7 @@ function Outputs(block)
     spec=[]; %will be what we send as a request to DSX
     %% Determine output based on case
 
-    if numel(loc)<2 
+    if numel(loc)== 1 
         spec = strcat(num2str(110),loc,'000000'); %add zero to pin location
     else
         spec = strcat(num2str(11),loc,'000000'); %no zero added as number has 2 digits

@@ -75,7 +75,7 @@ function servowrite(block)
     %% Save last value in work vector
     block.Dwork(1).Data = val;   
 function Terminate(block)
-Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, 0)); % send final value, off
+% Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, 0)); % send final value, off
 flush(evalin('base','DSX'));
 %endfunction
 

@@ -25,7 +25,7 @@ function setup(block)
 %% Register methods (what functions we'll use)
     block.RegBlockMethod('InitializeConditions', @InitializeConditions);
     block.RegBlockMethod('Outputs', @Outputs);     % Required
-    block.RegBlockMethod('Terminate', @Terminate); % Required
+%     block.RegBlockMethod('Terminate', @Terminate); % Required
     %endfunction
 function InitializeConditions(block)
 tic;
@@ -33,8 +33,6 @@ function Outputs(block)
 elapsedTime = toc;
 block.OutputPort(1).Data = elapsedTime;
 tic;
-function Terminate(block)
-toc;
-block.OutputPort(1).Data = elapsedTime;
+% function Terminate(block)
 %endfunction
 

@@ -2,7 +2,7 @@ function DSX_Servo_Write(block)
   setup(block);
 %endfunction
 function setup(block)
-    block.NumDialogPrms =1; % initial conditions; led off
+    block.NumDialogPrms =3; % initial conditions; led off
 
     %% Register number of input and output ports
     block.NumInputPorts  = 1;
@@ -48,12 +48,15 @@ function Update(block)
     val = round(block.InputPort(1).Data);
     lastval = block.Dwork(1).Data;
     
+    minval = block.DialogPrm(2).Data;
+    maxval = block.DialogPrm(3).Data;
+    
     %% Send command if it's different from the last sent, else nothing
     if val ~= lastval
-        if val > 180
-            val = 180;
-        elseif val < 0
-            val = 0;
+        if val > maxval
+            val = maxval;
+        elseif val < minval
+            val = minval;
         end
         Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, val));
     end

@@ -33,20 +33,25 @@ function InitializeConditions(block)
 
 function Outputs(block)  
     loc = block.DialogPrm(1).Data;
-    temp=[]; %will be what we send as a request to DSX
+    spec=[]; %will be what we send as a request to DSX
     %% Determine output based on case
 
-    if loc<10 
-        temp = str2num(strcat(num2str(110),num2str(loc),'000000')); %add zero to pin location
+    if numel(loc)== 1 
+        spec = strcat(num2str(110),loc,'000000'); %add zero to pin location
     else
-        temp = str2num(strcat(num2str(11),num2str(loc),'000000')); %no zero added as number has 2 digits
+        spec = strcat(num2str(11),loc,'000000'); %no zero added as number has 2 digits
     end
-
-    DSXval = Serial_Receive_callback('getval',temp);
     
-    if ~isempty(DSXval)
-        block.OutputPort(1).Data = str2num(DSXval);
-    end    
+    DSX_Read_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
+    ping = DSX_Read_callback('checkbuffer',spec); % this reads only the buffer and checks for commands, updates variables 
+    
+    if numel(ping)>8 % not empty & 0
+        [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping); 
+        if pingloc == loc
+            block.OutputPort(1).Data = str2num(pingval); % OUTPUT VALUE
+        end
+    end 
+
 function Terminate(block)
     flush(evalin('base','DSX'));
 %endfunction

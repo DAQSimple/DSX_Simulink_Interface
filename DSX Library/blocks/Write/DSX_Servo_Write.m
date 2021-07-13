@@ -2,7 +2,7 @@ function DSX_Servo_Write(block)
   setup(block);
 %endfunction
 function setup(block)
-    block.NumDialogPrms =1; % initial conditions; led off
+    block.NumDialogPrms =3; % initial conditions; led off
 
     %% Register number of input and output ports
     block.NumInputPorts  = 1;
@@ -14,7 +14,6 @@ function setup(block)
     block.SetPreCompOutPortInfoToDynamic;
 
     block.InputPort(1).DatatypeID = -1;
-
     block.InputPort(1).Dimensions        = 1;
     block.InputPort(1).DirectFeedthrough = true;
 
@@ -43,22 +42,41 @@ function InitializeConditions(block)
     block.Dwork(1).Data = 1337; %initialize work vector as a value that wont exist
 
 function Start(block)
-%% When simulation is run
-    block.Dwork(1).Data = 1337; %initialize work vector as a value that wont exist
-
+    % wait a cycle, no worries
 function Update(block)
 %% Send user input value as servo angle to DSX
-    val = round(block.InputPort(1).DataAsDouble);
-    if val > 180
-        val = 180;
-    end
+    val = round(block.InputPort(1).Data);
+    lastval = block.Dwork(1).Data;
+    
+    minval = block.DialogPrm(2).Data;
+    maxval = block.DialogPrm(3).Data;
+    
     %% Send command if it's different from the last sent, else nothing
-    if val ~= block.Dwork(1).Data
+    if val ~= lastval
+        if val > maxval
+            val = maxval;
+        elseif val < minval
+            val = minval;
+        end
         Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, val));
     end
     %% Save last value in work vector
-    block.Dwork(1).Data = val; 
-
+    block.Dwork(1).Data = val;   
+function servowrite(block)
+%% Send user input value as servo angle to DSX
+    val = round(block.InputPort(1).Data);
+    lastval = block.Dwork(1).Data;
+    if val > 180
+        val = 180;
+    elseif val < 0
+        val = 0;
+    end
+    %% Send command if it's different from the last sent, else nothing
+    if val ~= lastval
+        Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, val));
+    end
+    %% Save last value in work vector
+    block.Dwork(1).Data = val;   
 function Terminate(block)
 % Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, 0)); % send final value, off
 flush(evalin('base','DSX'));
@@ -83,8 +101,4 @@ switch size(val,2)
         val = strcat('0',val);
 end
 
-%Convert to integer to avoid siecntific notation troubles, then output
-%concatenated command:
-command = sprintf('%i',str2num(strcat('16',pin,'1',val,'0'))); %convert from scientific
-% assignin('base','servowritecommand',command);
-
+command = strcat('16',pin,'1',val,'0');

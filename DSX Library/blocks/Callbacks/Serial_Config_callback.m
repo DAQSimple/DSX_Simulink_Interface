@@ -1,6 +1,6 @@
 function Serial_Config_callback(command,com,baud)
 %% Input checks
-initBaud = 9600;
+initBaud = 256000;
 timeOutString = 'DSX.Timeout = 1';
 [ports,numports] = Serial_Get_Ports();  % get list of all com ports
 likely_com = ports(numports);           % guess that the device is the last com port
@@ -9,6 +9,7 @@ w=evalin('base','whos');
 exist_globalCom = ismember('globalCom',[w(:).name]);
 exist_globalBaud = ismember('globalCom',[w(:).name]);
 exist_sBuffer = ismember('globalBaud',[w(:).name]);
+
 
 if exist_globalCom>0
 else
@@ -38,19 +39,17 @@ end
 %             disp('Cleared base workspace.'); 
             clear all;
         case 'init'
-            w=evalin('base','whos');
-            DSXexist = ismember('DSX',[w(:).name]);
-            if DSXexist>0
-                %nothing
-                flush(evalin('base','DSX'));   
-%                 dispp('A connection is already established.');
-            else
-               
+            exist_DSX = ismember('DSX',[w(:).name]);
+            if exist_DSX>0
+              %% clear serial buffer
+                flush(evalin('base','DSX'));            
+            else      
                 assignin('base','DSX',serialport(evalin('base','globalCom'),evalin('base','globalBaud')));
                 evalin('base',timeOutString); % set DSX timeout 
 %                 Serial_Send_callback('send','0000000000');
                 fprintf('\nSuccessfully initialized DSX serial connection to %s at %u Baud.\n\n',evalin('base','globalCom'),evalin('base','globalBaud')); 
-            end %try        
+            end %try 
+            assignin('base','sBuffer',[]); % clear sBuffer 
         case 'update'
             evalin('base', 'clear DSX');
             assignin('base','globalBaud',baud)

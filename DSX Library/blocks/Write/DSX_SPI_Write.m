@@ -1,9 +1,9 @@
-function DSX_I2C_Write(block)
+function DSX_SPI_Write(block)
     setup(block);
     
 % Define block properties    
 function setup(block)
-    block.NumDialogPrms = 3; %Number of variables to import from mask
+    block.NumDialogPrms = 1; %Number of variables to import from mask
 
     %% Register number of input and output ports
     block.NumInputPorts  = 1;
@@ -42,6 +42,8 @@ function InitializeConditions(block)
    
 function Start(block)
     block.Dwork(1).Data = 1337; %initialize work vector as a value that wont exist
+    setMode(block.DialogPrm(2).Data);
+    setPrescaler(block.DialogPrm(3).Data);
 
 function Update (block)
 %% Every Time step
@@ -55,22 +57,19 @@ function Update (block)
     end
     %% only send command if it's unique from last
     if val ~= block.Dwork(1).Data 
-        Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,val));
+        Serial_Send_callback('send',toCommand(val));
     end
     %% save current value in work vector for next iteration
     block.Dwork(1).Data = val; % save current value for next update
-
-
+    
 function Terminate(block)
 %% When program is stopped or the block is deleted
-    Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,0)); % send final value, off
+    Serial_Send_callback('send',toCommand(0)); % send final value, off
     flush(evalin('base','DSX'));
 
-
-function command = toCommand(loc,val)
+function command = toCommand(val)
 %% Convert pin# and input value into a DSX 10-bit command
 val = num2str(val);
-loc = num2str(loc);
 switch numel(val)
     case 1
         val = strcat('000',val);
@@ -81,4 +80,34 @@ switch numel(val)
     case 4
         val = val;
 end            
-    command = strcat('23',loc,'0',val,'0');
+    command = strcat('26','00','0',val,'0');
+    
+function setMode(val)
+val = num2str(val);
+    switch numel(val)
+        case 1
+            val = strcat('000',val);
+        case 2
+            val = strcat('00',val);
+        case 3
+            val = strcat('0',val);
+        case 4
+            val = val;
+    end  
+    Serial_Send_callback('send',strcat('24','00','0',val,'0'));
+
+function setPrescaler(val)
+val = num2str(val);
+    switch numel(val)
+        case 1
+            val = strcat('000',val);
+        case 2
+            val = strcat('00',val);
+        case 3
+            val = strcat('0',val);
+        case 4
+            val = val;
+    end  
+    Serial_Send_callback('send',strcat('25','00','0',val,'0'));
+
+

@@ -40,6 +40,10 @@ pingOut = '0';
             pingOut = char(readline(DSX));
             %% Ensure the command is valid, else discard
             if numel(pingOut)>9
+                if pingOut(1:2) == '22'
+                    f = errordlg('Simulation stopped due to SOS message from DSX', 'DSX Emergency Shutdown','modal');
+                    set_param(gcs, 'SimulationCommand', 'stop');
+                end
                     new_sBuffer = [sBuffer;pingOut];      % add ping to end 
                     assignin('base','sBuffer',new_sBuffer); % update sBuffer in base workspace
             end        

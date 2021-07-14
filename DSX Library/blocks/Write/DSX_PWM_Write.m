@@ -53,9 +53,12 @@ function DoPostPropSetup(block)
 function InitializeConditions(block)
     Serial_Config_callback('init'); % make sure port is set up
     block.Dwork(1).Data = 1337; %initialize work vector as a value that wont exist
-    
+    checkpins(block.DialogPrm(1).Data,"clr");
 function Start(block)
     block.Dwork(1).Data = 1337; %initialize work vector as a value that wont exist
+    %% make sure the pin isnt already assigned
+    checkpins(block.DialogPrm(1).Data,"check");
+    %%
     firstFREQ = round(block.InputPort(2).DataAsDouble); % check their input frequency    
     
     if firstFREQ == 0 || firstFREQ < 0

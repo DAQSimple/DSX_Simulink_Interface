@@ -39,9 +39,8 @@ function InitializeConditions(block)
 function Start(block)
     %% load CPR from mask
     CPR = block.DialogPrm(1).Data;
-    try
-        check = str2num(CPR);
-    catch
+    %% if no numbers are in the STR (invalid entry), str2num() will return [], which will return 1 from isempty()
+    if isempty(str2num(CPR))
         f = errordlg('Invalid CPR input. Please only enter numbers :)', 'Encoder Count Error','modal');
         set_param(gcs, 'SimulationCommand', 'stop');
     end

@@ -6,7 +6,7 @@ exist_DSX = ismember('DSX',[w(:).name]);
 % exist_sBuffer = ismember('dsx_struct',[w(:).name]);
 % exist_sBuffer = exist('sBuffer');
 if ~exist('spec')
-    spec = [];
+    spec = '';
 else 
     spec = char(spec); % its char for sure now
 end

@@ -81,4 +81,4 @@ switch numel(val)
     case 4
         val = val;
 end            
-    command = strcat('23',loc,'0',val,'0');
+    command = strcat('23','0',loc,'0',val,'0');

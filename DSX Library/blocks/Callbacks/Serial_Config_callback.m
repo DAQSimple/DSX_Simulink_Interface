@@ -58,7 +58,8 @@ end
             assignin('base','sBuffer',[]); % clear sBuffer 
         case 'update'
             evalin('base', 'clear DSX');
-            assignin('base','globalBaud',baud)
+            assignin('base','globalBaud',baud);
+            assignin('base','globalBaud',com);
             
             if isstring(com)    % convert to char array
                 com=char(com);

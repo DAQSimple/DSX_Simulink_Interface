@@ -59,7 +59,7 @@ end
         case 'update'
             evalin('base', 'clear DSX');
             assignin('base','globalBaud',baud);
-            assignin('base','globalBaud',com);
+            assignin('base','globalCom',com);
             
             if isstring(com)    % convert to char array
                 com=char(com);

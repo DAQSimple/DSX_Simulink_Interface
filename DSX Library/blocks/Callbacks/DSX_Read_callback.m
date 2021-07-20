@@ -1,5 +1,6 @@
 function [pingOut] = DSX_Read_callback(command,spec)
 %% Checks
+tic();
 w=evalin('base','whos');
 exist_sBuffer = ismember('sBuffer',[w(:).name]);
 exist_DSX = ismember('DSX',[w(:).name]);
@@ -15,9 +16,17 @@ if ~exist('command')
 else 
     command = char(lower(command)); % its char for sure now
 end
+a = toc();
+assignin('base','DSX_Read_start_checks',a);
+tic();
 %% Define current command in a struct
-[id,loc,sign,val,ret] = splitping(spec);  
+[id,loc,sign,val,ret] = splitping(spec);
+a = toc();
+assignin('base','DSX_Read_splitping',a);
 %% Checks
+
+tic();
+
 if exist_sBuffer  
     sBuffer = evalin('base','sBuffer');
 else
@@ -28,6 +37,8 @@ if exist_DSX
 else
     Serial_Config_callback('init');
 end
+a = toc();
+assignin('base','DSX_Read_if_exists',a);
 %% Initialize output
 pingOut = '0';
 %% Commands
@@ -48,6 +59,7 @@ pingOut = '0';
                     assignin('base','sBuffer',new_sBuffer); % update sBuffer in base workspace
             end        
         case 'checkbuffer'
+            tic();
             %% If ping(s) we want are in buffer
             [index,pingOut] = inBuffer(sBuffer, id, loc);
             if index >0
@@ -56,6 +68,8 @@ pingOut = '0';
                 sBuffer(index,:) = [];
                 assignin('base','sBuffer',sBuffer); % update sBuffer in base workspace     
             end
+            a = toc();
+            assignin('base','DSX_Read_check_buffer',a);
         case 'simpleread'
             pingOut = readline(evalin('base','DSX'));
         case 'read'

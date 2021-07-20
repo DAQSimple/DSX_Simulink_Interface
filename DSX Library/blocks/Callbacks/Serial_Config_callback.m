@@ -1,7 +1,7 @@
 function Serial_Config_callback(command,com,baud)
 %% Input checks
 initBaud = 230400;
-timeOutString = 'DSX.Timeout = 200e-6';
+timeOutString = 'DSX.Timeout = 1';
 [ports,numports] = Serial_Get_Ports();  % get list of all com ports
 likely_com = ports(numports);           % guess that the device is the last com port
 %% Check globals

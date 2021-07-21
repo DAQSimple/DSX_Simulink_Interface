@@ -40,11 +40,15 @@ function InitializeConditions(block)
 %% When block is born
     Serial_Config_callback('init');
     block.Dwork(1).Data = 1337; %initialize work vector as a value that wont exist
-
+    checkpins(block.DialogPrm(1).Data,"clr");
+%% define PWM slot
 function Start(block)
-    % wait a cycle, no worries
+%% check pins for errors
+checkpins(block.DialogPrm(1).Data,"check");
+    
 function Update(block)
 %% Send user input value as servo angle to DSX
+    
     val = round(block.InputPort(1).Data);
     lastval = block.Dwork(1).Data;
     
@@ -87,9 +91,9 @@ function command = toCommand(pin,val)
 % assignin('base','pwmval',val);
 
 %% Assign leading zero to pin value if necessary:
-if length(pin) == 1
-    pin = strcat('0',pin);
-end
+% if length(pin) == 1
+%     pin = strcat('0',pin);
+% end
 %% Assign leading zeros to PWM value if necessary:
 val=num2str(val);
 switch size(val,2)

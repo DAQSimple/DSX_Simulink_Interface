@@ -1,4 +1,6 @@
 function [index,pingOut] = inBuffer(sBuffer, id, loc)
+% tic;
+
 index = 0;
 pingOut = '0';
 if size(sBuffer,1)>0
@@ -12,3 +14,7 @@ if size(sBuffer,1)>0
         end      
     end
 end
+
+% t = toc;
+% assignin('base','inBufferTime', t); 
+    

@@ -1,9 +1,9 @@
-function DSX_I2C_Write(block)
+function DSX_myBlock(block)
     setup(block);
     
 % Define block properties    
 function setup(block)
-    block.NumDialogPrms = 3; %Number of variables to import from mask
+    block.NumDialogPrms =1; %Number of variables to import from mask
 
     %% Register number of input and output ports
     block.NumInputPorts  = 1;
@@ -45,24 +45,16 @@ function Start(block)
 
 function Update (block)
 %% Every Time step
-    val = round(block.InputPort(1).Data); % Data input to block
-    
+    val = block.InputPort(1).Data; % Data input to block
     %% Round to logic ON or OFF 
-    if val > 100  % Too big
-        val = 100;
-        sign = '0';  
-    elseif val > 0 % Positive and acceptable
-        sign = '0';
-    elseif val < 0 && val > -100 % Negative and acceptable
-        val = abs(val);
-        sign = '1';
-    elseif val < -100 % Negative and too big
-        val = 100;
-        sign = '1';
+    if val >= 0.5  % 0 or 1
+        val = 1;
+    else
+        val = 0;
     end
     %% only send command if it's unique from last
     if val ~= block.Dwork(1).Data 
-        Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,val,sign));
+        Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, val));
     end
     %% save current value in work vector for next iteration
     block.Dwork(1).Data = val; % save current value for next update
@@ -70,22 +62,13 @@ function Update (block)
 
 function Terminate(block)
 %% When program is stopped or the block is deleted
-    Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,0,'0')); % send final value, off
+    Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, 0)); % send final value, off
     flush(evalin('base','DSX'));
 
 
-function command = toCommand(loc,val,sign)
+function command = toCommand(pin,val)
 %% Convert pin# and input value into a DSX 10-bit command
-val = num2str(val);
-loc = num2str(loc);
-switch numel(val)
-    case 1
-        val = strcat('000',val);
-    case 2
-        val = strcat('00',val);
-    case 3
-        val = strcat('0',val);
-    case 4
-        val = val;
-end            
-    command = strcat('23','0',loc,sign,val,'0');
+    if size(pin) == 1
+        pin = strcat('0',pin);
+    end
+    command = strcat('10',num2str(pin),'1','000',num2str(val),'0');

@@ -19,29 +19,46 @@ function setup(block)
     block.OutputPort(1).Complexity  = 'Real';
     
 %% Set block sample time to inherited
-    block.SampleTimes = [-1 0];
+    block.SampleTimes = [-1, 0];
     
 %% Set the block simStateCompliance to default (i.e., same as a built-in block)
     block.SimStateCompliance = 'DefaultSimState';
 %% Register methods (what functions we'll use)
     block.RegBlockMethod('InitializeConditions', @InitializeConditions);
+    block.RegBlockMethod('PostPropagationSetup',    @DoPostPropSetup);
     block.RegBlockMethod('Outputs', @Outputs);     % Required
     block.RegBlockMethod('Terminate', @Terminate); % Required
     %endfunction
-function InitializeConditions(block)
+ 
+function DoPostPropSetup(block)
+    %% Work Vectors
+    % Work Vector 1: For storing VAL between iterations
+    block.NumDworks = 1;
+    block.Dwork(1).Name            = 'lastval';
+    block.Dwork(1).Dimensions      = 1;
+    block.Dwork(1).DatatypeID      = 0;      % double
+    block.Dwork(1).Complexity      = 'Real'; % real
+    block.Dwork(1).UsedAsDiscState = 0;
+    
+ function InitializeConditions(block)
     Serial_Config_callback('init');
     flush(evalin('base','DSX'));
-
+    block.Dwork(1).Data = 9999; 
 function Outputs(block)  
-    loc = block.DialogPrm(1).Data;
-    spec=[]; %will be what we send as a request to DSX
-    %% Determine output based on case
-    spec = str2num(strcat(num2str(13),num2str(loc),'000003')); %no zero added as number has 2 digits
-
-    DSXval = Serial_Receive_callback('getval',spec);
-    if ~isempty(DSXval)  
-        block.OutputPort(1).Data = str2num(DSXval);
-    end    
+    loc = block.DialogPrm(1).Data; 
+    %% Serial
+    spec = strcat('13', num2str(loc), '0','0000','0');
+%     DSX_Read_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
+    ping = DSX_Read_callback('readcheck',spec); % this reads only the buffer and checks for commands, updates variables
+    %% Check Ping
+    if numel(ping)>1 % not empty & 0
+        [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping); 
+        if pingloc == loc
+            VAL = str2num(pingval);
+%                 assignin('base','AreadVAL',VAL);
+                block.OutputPort(1).Data = VAL;
+        end
+    end  
 function Terminate(block)
     flush(evalin('base','DSX'));
 %endfunction

@@ -1,4 +1,4 @@
-function DSX_Digital_Write(block)
+function DSX_myBlock(block)
     setup(block);
     
 % Define block properties    
@@ -55,7 +55,6 @@ function Update (block)
     %% only send command if it's unique from last
     if val ~= block.Dwork(1).Data 
         Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data, val));
-        assignin('base','sentVal',val);
     end
     %% save current value in work vector for next iteration
     block.Dwork(1).Data = val; % save current value for next update
@@ -72,4 +71,4 @@ function command = toCommand(pin,val)
     if size(pin) == 1
         pin = strcat('0',pin);
     end
-    command = sprintf('%i',str2num(strcat('10',pin,'1','000',num2str(val),'0')));
+    command = strcat('10',num2str(pin),'1','000',num2str(val),'0');

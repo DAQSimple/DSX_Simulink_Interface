@@ -73,7 +73,7 @@ function Update (block)
 
 function Terminate(block)
 %% When program is stopped or the block is deleted
-    Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,0,'0')); % send final value, off
+    Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,0)); % send final value, off
     flush(evalin('base','DSX'));
 
 

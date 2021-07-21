@@ -46,23 +46,26 @@ function Start(block)
 function Update (block)
 %% Every Time step
     val = round(block.InputPort(1).Data); % Data input to block
-    
     %% Round to logic ON or OFF 
     if val > 100  % Too big
         val = 100;
-        sign = '0';  
+        sign = 0;  
     elseif val > 0 % Positive and acceptable
-        sign = '0';
+        sign = 0;
     elseif val < 0 && val > -100 % Negative and acceptable
         val = abs(val);
-        sign = '1';
+        sign = 1;
     elseif val < -100 % Negative and too big
         val = 100;
-        sign = '1';
+        sign = 1;
     end
+    %% Processing
+
+    intOut = bitor(val, bitshift(sign,7));    
+    
     %% only send command if it's unique from last
     if val ~= block.Dwork(1).Data 
-        Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,val,sign));
+        Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,intOut));
     end
     %% save current value in work vector for next iteration
     block.Dwork(1).Data = val; % save current value for next update
@@ -74,7 +77,7 @@ function Terminate(block)
     flush(evalin('base','DSX'));
 
 
-function command = toCommand(loc,val,sign)
+function command = toCommand(loc,val)
 %% Convert pin# and input value into a DSX 10-bit command
 val = num2str(val);
 loc = num2str(loc);
@@ -88,4 +91,4 @@ switch numel(val)
     case 4
         val = val;
 end            
-    command = strcat('23','0',loc,sign,val,'0');
+    command = strcat('23','0',loc,'0',val,'0');

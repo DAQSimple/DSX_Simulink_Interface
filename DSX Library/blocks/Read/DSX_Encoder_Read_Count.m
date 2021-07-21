@@ -61,8 +61,8 @@ function Start(block)
     
 function Outputs(block)  
     spec = strcat('29','00','000000'); 
-    DSX_Read_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
-    ping = DSX_Read_callback('checkbuffer',spec); % this reads only the buffer and checks for commands, updates variables
+%     DSX_Read_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
+    ping = DSX_Read_callback('readcheck',spec); % this reads only the buffer and checks for commands, updates variables
     %% hello jay
     if numel(ping)>8 % not empty & 0
         [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping); 

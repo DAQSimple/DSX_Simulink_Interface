@@ -1,6 +1,6 @@
 function [pingOut] = DSX_Read_callback(command,spec)
 %% Checks
-% tic();
+tic();
 
 try % attempt to see if we've checked this already
     CHECKED.read = evalin('base','CHECKED.read');
@@ -24,16 +24,16 @@ end
 % else 
 %     command = char(lower(command)); % its char for sure now
 % end
-% a = toc();
-% assignin('base','DSX_Read_start_checks',a);
-% tic();
+a = toc();
+assignin('base','DSX_Read_start_checks',a);
+tic();
 %% Split ping
 [id,loc,sign,val,ret] = splitping(spec);
-% a = toc();
-% assignin('base','DSX_Read_splitping',a);
+a = toc();
+assignin('base','DSX_Read_splitping',a);
 %% Checks
 
-% tic();
+tic();
 
 if CHECKED.read == 1  
     sBuffer = evalin('base','sBuffer');
@@ -42,8 +42,8 @@ else
     sBuffer = [];
     Serial_Config_callback('init');
 end
-% a = toc();
-% assignin('base','DSX_Read_if_exists',a);
+a = toc();
+assignin('base','DSX_Read_if_exists',a);
 %% Initialize output
 pingOut = '0';
 %% Commands
@@ -64,7 +64,7 @@ pingOut = '0';
                     assignin('base','sBuffer',new_sBuffer); % update sBuffer in base workspace
             end        
         case 'checkbuffer'
-%             tic();
+            tic();
             %% If ping(s) we want are in buffer
             [index,pingOut] = inBuffer(sBuffer, id, loc);
             if index >0
@@ -72,10 +72,9 @@ pingOut = '0';
                 sBuffer(index,:) = [];
                 assignin('base','sBuffer',sBuffer); % update sBuffer in base workspace     
             end
-%             a = toc();
-%             assignin('base','DSX_Read_check_buffer',a);
+            a = toc();
+            assignin('base','DSX_Read_check_buffer',a);
         case 'readcheck'
-%             tic;
             %% Ask DSX for value 
             writeline(DSX,spec);
             %% Read next line in serial buffer
@@ -97,8 +96,8 @@ pingOut = '0';
                 sBuffer(index,:) = [];
                 assignin('base','sBuffer',sBuffer); % update sBuffer in base workspace     
             end
-%             a = toc();
-%             assignin('base','READCHECK_time',a);
+            a = toc();
+            assignin('base','DSX_Read_check_buffer',a);
         case 'simpleread'
             pingOut = readline(evalin('base','DSX'));
         case 'read'

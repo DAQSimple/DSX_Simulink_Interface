@@ -43,8 +43,8 @@ function InitializeConditions(block)
 
 function Update (block)
     spec = strcat('27', '00', '0','0000','0');
-    DSX_Read_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
-    ping = DSX_Read_callback('checkbuffer',spec); % this reads only the buffer and checks for commands, updates buffer after
+%     DSX_Read_callback('readnext',spec); % read this stuff but dont use it, just reading into the buffer
+    ping = DSX_Read_callback('readcheck',spec);
     %% Check Ping
     if numel(ping)>8 % not empty & 0
         [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping); 

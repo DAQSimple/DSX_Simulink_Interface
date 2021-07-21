@@ -60,7 +60,8 @@ pingOut = '0';
                     f = errordlg('Simulation stopped due to SOS message from DSX', 'DSX Emergency Shutdown','modal');
                     set_param(gcs, 'SimulationCommand', 'stop');
                 end
-                    new_sBuffer = [sBuffer;pingOut];      % add ping to end 
+                    new_sBuffer = [pingOut;sBuffer];      % add ping to start
+                    
                     assignin('base','sBuffer',new_sBuffer); % update sBuffer in base workspace
             end        
         case 'checkbuffer'
@@ -86,7 +87,7 @@ pingOut = '0';
                     f = errordlg('Simulation stopped due to SOS message from DSX', 'DSX Emergency Shutdown','modal');
                     set_param(gcs, 'SimulationCommand', 'stop');
                 end
-                    new_sBuffer = [sBuffer;pingOut];      % add ping to end 
+                    new_sBuffer = [pingOut;sBuffer];      % add ping to start
                     assignin('base','sBuffer',new_sBuffer); % update sBuffer in base workspace
             end
             

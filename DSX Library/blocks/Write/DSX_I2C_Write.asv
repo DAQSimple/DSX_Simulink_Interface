@@ -48,21 +48,21 @@ function Update (block)
     val = round(block.InputPort(1).Data); % Data input to block
     
     %% Round to logic ON or OFF 
-    if val > 100  % Too big
-        val = 100;
-        sign = '0';  
-    elseif val > 0 % Positive and acceptable
+    if val > 255  % 0 or 1
+        val = 255;
         sign = '0';
-    elseif val < 0 && val > -100 % Negative and acceptable
+    elseif val > 0
+        sign = '0';
+    elseif val < 0 && val > -255
         val = abs(val);
         sign = '1';
-    elseif val < -100 % Negative and too big
-        val = 100;
+    elseif val < -255
+        val = 255;
         sign = '1';
     end
     %% only send command if it's unique from last
     if val ~= block.Dwork(1).Data 
-        Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,val,sign));
+        Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,val));
     end
     %% save current value in work vector for next iteration
     block.Dwork(1).Data = val; % save current value for next update
@@ -70,7 +70,7 @@ function Update (block)
 
 function Terminate(block)
 %% When program is stopped or the block is deleted
-    Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,0,'0')); % send final value, off
+    Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,0)); % send final value, off
     flush(evalin('base','DSX'));
 
 

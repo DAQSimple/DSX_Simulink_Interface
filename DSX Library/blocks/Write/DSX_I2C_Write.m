@@ -45,19 +45,22 @@ function Start(block)
 
 function Update (block)
 %% Every Time step
-    val = round(block.InputPort(1).Data); % Data input to block
-    %% Round to logic ON or OFF 
-    if val > 100  % Too big
+    valIn = round(block.InputPort(1).DataAsDouble); % Data input to block
+    %% Round to logic ON or OFF
+    sign = 0;
+    if valIn > 100  % Too big
         val = 100;
         sign = 0;  
-    elseif val > 0 % Positive and acceptable
+    elseif valIn >= 0 % Positive and acceptable
         sign = 0;
-    elseif val < 0 && val > -100 % Negative and acceptable
+    elseif valIn < 0 && val > -100 % Negative and acceptable
         val = abs(val);
         sign = 1;
-    elseif val < -100 % Negative and too big
+    elseif valIn <= -100 % Negative and too big
         val = 100;
         sign = 1;
+    else
+        val = 0;
     end
     %% Processing
 
@@ -68,7 +71,7 @@ function Update (block)
         Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,intOut));
     end
     %% save current value in work vector for next iteration
-    block.Dwork(1).Data = val; % save current value for next update
+    block.Dwork(1).Data = valIn; % save current value for next update
 
 
 function Terminate(block)

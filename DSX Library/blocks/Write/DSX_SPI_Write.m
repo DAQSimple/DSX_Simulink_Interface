@@ -3,7 +3,7 @@ function DSX_SPI_Write(block)
     
 % Define block properties    
 function setup(block)
-    block.NumDialogPrms = 1; %Number of variables to import from mask
+    block.NumDialogPrms = 2; %Number of variables to import from mask
 
     %% Register number of input and output ports
     block.NumInputPorts  = 1;
@@ -42,8 +42,8 @@ function InitializeConditions(block)
    
 function Start(block)
     block.Dwork(1).Data = 1337; %initialize work vector as a value that wont exist
-    setMode(block.DialogPrm(2).Data);
-    setPrescaler(block.DialogPrm(3).Data);
+    setMode(block.DialogPrm(1).Data);
+    setPrescaler(block.DialogPrm(2).Data);
 
 function Update (block)
 %% Every Time step

@@ -52,9 +52,10 @@ function Update (block)
         val = 100;
         sign = 0;  
     elseif valIn >= 0 % Positive and acceptable
+        val = valIn;
         sign = 0;
-    elseif valIn < 0 && val > -100 % Negative and acceptable
-        val = abs(val);
+    elseif valIn < 0 && valIn > -100 % Negative and acceptable
+        val = abs(valIn);
         sign = 1;
     elseif valIn <= -100 % Negative and too big
         val = 100;
@@ -67,7 +68,7 @@ function Update (block)
     intOut = bitor(val, bitshift(sign,7));    
     
     %% only send command if it's unique from last
-    if val ~= block.Dwork(1).Data 
+    if valIn ~= block.Dwork(1).Data 
         Serial_Send_callback('send',toCommand(block.DialogPrm(1).Data,intOut));
     end
     %% save current value in work vector for next iteration

@@ -65,8 +65,12 @@ function Outputs(block)
     ping = DSX_Read_callback('readcheck',spec); % this reads only the buffer and checks for commands, updates variables
     %% hello jay
     if numel(ping)>8 % not empty & 0
-        [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping); 
-        block.OutputPort(1).Data = str2num(pingval); 
+        [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping);
+        if pingsign == '0'
+            block.OutputPort(1).Data = str2num(pingval);
+        elseif pingsign == '1'
+            block.OutputPort(1).Data = -str2num(pingval);
+        end
     end
     
 function Terminate(block)

@@ -25,7 +25,7 @@ function setup(block)
     block.RegBlockMethod('PostPropagationSetup',    @DoPostPropSetup);
     block.RegBlockMethod('InitializeConditions', @InitializeConditions);
     block.RegBlockMethod('Start', @Start);
-    block.RegBlockMethod('Outputs', @Outputs);     % Required
+%     block.RegBlockMethod('Outputs', @Outputs);     % Required
 %     block.RegBlockMethod('Terminate', @Terminate); % Required
     %endfunction
 
@@ -61,32 +61,32 @@ function Start(block)
     
 
     
-function Outputs(block)
-    cmd         = '21'; % limit switch lookup table code
-    loc         = num2str(block.DialogPrm(1).Data);  % pin location
-    emerg_state = num2str(block.DialogPrm(2).Data); % dialog box
-    val         = '0000';
-    ret         = '0';  
-    limit_init = toCommand(cmd,loc,emerg_state,val,ret); % make our beloved DSX ping variable
-    %% Read value and check buffer
-    ping = DSX_Read_callback('checkbuffer',limit_init); % use initial ping
-    [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping);
-    %% check
-    if ~isempty(ping) % if there was succesfully a CMD21 ping
-        if pingloc == loc % is it for this block?                
-            if pingsign == '1' 
-                % not crucial stop, execute commands
-                if pingret == '1' % write 1  
-                    block.OutputPort(1).Data = 1;
-                elseif pingret == '0' % write 0
-                    block.OutputPort(1).Data = 0;
-                end              
-            elseif pingsign == '0'
-                % crucial stop, output bad and sit back
-                block.OutputPort(1).Data = 10;
-            end
-        end
-    end
+% function Outputs(block)
+%     cmd         = '21'; % limit switch lookup table code
+%     loc         = num2str(block.DialogPrm(1).Data);  % pin location
+%     emerg_state = num2str(block.DialogPrm(2).Data); % dialog box
+%     val         = '0000';
+%     ret         = '0';  
+%     limit_init = toCommand(cmd,loc,emerg_state,val,ret); % make our beloved DSX ping variable
+%     %% Read value and check buffer
+%     ping = DSX_Read_callback('checkbuffer',limit_init); % use initial ping
+%     [pingid, pingloc, pingsign, pingval, pingret] = splitping(ping);
+%     %% check
+%     if ~isempty(ping) % if there was succesfully a CMD21 ping
+%         if pingloc == loc % is it for this block?                
+%             if pingsign == '1' 
+%                 % not crucial stop, execute commands
+%                 if pingret == '1' % write 1  
+%                     block.OutputPort(1).Data = 1;
+%                 elseif pingret == '0' % write 0
+%                     block.OutputPort(1).Data = 0;
+%                 end              
+%             elseif pingsign == '0'
+%                 % crucial stop, output bad and sit back
+%                 block.OutputPort(1).Data = 10;
+%             end
+%         end
+%     end
 function string = toCommand(cmd,loc,emerg_state,val,ret) % convert our inputs to a command, lovelyly
     string = strcat(cmd,'0',loc,emerg_state,val,ret); % add zero for ping loc as its only '7' not '07' 
 % function Terminate()

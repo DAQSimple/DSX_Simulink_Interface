@@ -24,15 +24,24 @@ function setup(block)
     block.SimStateCompliance = 'DefaultSimState';
 %% Register methods (what functions we'll use)
     block.RegBlockMethod('InitializeConditions', @InitializeConditions);
+    block.RegBlockMethod('PostPropagationSetup',    @DoPostPropSetup);
     block.RegBlockMethod('Outputs', @Outputs);     % Required
 %     block.RegBlockMethod('Terminate', @Terminate); % Required
     %endfunction
+    
+    function DoPostPropSetup(block)
+    %% Work Vectors
+    % Work Vector 1: For storing VAL between iterations
+    block.NumDworks = 1;
+    block.Dwork(1).Name            = 'tic';
+    block.Dwork(1).Dimensions      = 1;
+    block.Dwork(1).DatatypeID      = 0;      % double
+    block.Dwork(1).Complexity      = 'Real'; % real
+    block.Dwork(1).UsedAsDiscState = 0;
 function InitializeConditions(block)
 tic;
-function Outputs(block)  
+
+function Outputs(block)
 elapsedTime = toc;
 block.OutputPort(1).Data = elapsedTime;
 tic;
-% function Terminate(block)
-%endfunction
-

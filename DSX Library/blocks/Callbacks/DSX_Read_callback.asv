@@ -86,27 +86,11 @@ pingOut = '0';
                 if pingOut(1:2) == '22'
                     switch pingOut(6:9)
                         case '0420'
-                            f = errordlg('OVER-CURRENT DETECTED.', 'DSX Emergency Shutdown','modal');
+                            f = errordlg('OVER-CURRENT DETECTED', 'DSX Emergency Shutdown','modal');
                             set_param(gcs, 'SimulationCommand', 'stop');
                         case '0421'
-                            f = errordlg('OVER-TEMPERATURE DETECTED.', 'DSX Emergency Shutdown','modal');
+                            f = errordlg('OVER-TEMPERATURE DETECTED', 'DSX Emergency Shutdown','modal');
                             set_param(gcs, 'SimulationCommand', 'stop');
-                        case '0422'
-                            f = errordlg('REVERSE POLARITY DETECTED.', 'DSX Emergency Shutdown','modal');
-                            set_param(gcs, 'SimulationCommand', 'stop');
-                        case '0423'
-                            f = errordlg('USB FAULT DETECTED.', 'DSX Emergency Shutdown','modal');
-                            set_param(gcs, 'SimulationCommand', 'stop');
-                        case '0424'
-                            f = errordlg('UART COMMS FAULT DETECTED.', 'DSX Emergency Shutdown','modal');
-                            set_param(gcs, 'SimulationCommand', 'stop');
-                        case '0425'
-                            f = errordlg('LIMIT SWITCH TRIGGERED.', 'DSX Emergency Shutdown','modal');
-                            set_param(gcs, 'SimulationCommand', 'stop');
-                        case '0426'
-                            f = errordlg('TIM SAXON IS WAY TOO SEXY.', 'BEAUTY OVERLOAD - HIDE YOUR WIVES','modal');
-                            set_param(gcs, 'SimulationCommand', 'stop');
-                    end
                     
                 end
                     new_sBuffer = [pingOut;sBuffer];      % add ping to start

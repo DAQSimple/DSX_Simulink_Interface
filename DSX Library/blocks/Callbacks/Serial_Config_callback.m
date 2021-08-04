@@ -50,9 +50,16 @@ end
                 fprintf('\nSuccessfully initialized DSX serial connection to %s at %u Baud.\n\n',evalin('base','globalCom'),evalin('base','globalBaud')); 
             end %try 
             assignin('base','sBuffer',[]); % clear sBuffer 
+        case 'initclr'  
+            assignin('base','DSX',serialport(evalin('base','globalCom'),evalin('base','globalBaud')));
+            evalin('base',timeOutString); % set DSX timeout 
+            fprintf('\nSuccessfully initialized DSX serial connection to %s at %u Baud.\n\n',evalin('base','globalCom'),evalin('base','globalBaud')); 
+            
+            assignin('base','sBuffer',[]); % clear sBuffer 
         case 'update'
             evalin('base', 'clear DSX');
-            assignin('base','globalBaud',baud)
+            assignin('base','globalBaud',baud);
+            assignin('base','globalCom',com);
             
             if isstring(com)    % convert to char array
                 com=char(com);
